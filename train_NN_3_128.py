@@ -1,8 +1,19 @@
+import datetime
 import numpy as np
 import json
+import os
+import shutil
 
 training_inputs = []
 training_targets = []
+
+# Variables
+number_of_inputs = None
+number_of_outputs = None
+size_hidden_layers = None
+number_of_hidden_layers = None
+learning_rate = None
+number_of_epochs = None
 
 # Weights and biases variables
 weights_layer1 = None
@@ -127,6 +138,24 @@ class Optimizer_SGD:
         self.learning_rate = new_learning_rate
 
 
+def load_configurarions():
+    global number_of_inputs
+    global number_of_outputs
+    global number_of_hidden_layers
+    global size_hidden_layers
+    global learning_rate
+    global number_of_epochs
+
+    with open('Config\initial_config.json', 'r') as file:
+        configurations = json.load(file)
+
+    number_of_inputs = configurations['number_of_inputs']
+    number_of_outputs = configurations['number_of_outputs']
+    size_hidden_layers = configurations['size_hidden_layers']
+    number_of_hidden_layers = configurations['number_of_hidden_layers']
+    learning_rate = configurations['learning_rate']
+    number_of_epochs = configurations['number_of_epochs']
+
 
 def ask_user_weights():
     print('Load weigths or use random weights?')
@@ -145,23 +174,30 @@ def initialize_weights(weight_option):
     global biases_layer2
     global weights_layer3
     global biases_layer3
-    
+
     if weight_option == 1:
-        with open('hidden_layer1_weights.txt', 'r') as file:
-            weights_layer1 = np.loadtxt(file)
-        with open('hidden_layer1_biases.txt', 'r') as file:
-            biases_layer1 = np.loadtxt(file)
-            biases_layer1 = biases_layer1.reshape(1, 86)
-        with open('hidden_layer2_weights.txt', 'r') as file:
-            weights_layer2 = np.loadtxt(file)
-        with open('hidden_layer2_biases.txt', 'r') as file:
-            biases_layer2 = np.loadtxt(file)
-            biases_layer2 = biases_layer2.reshape(1, 86)
-        with open('hidden_layer3_weights.txt', 'r') as file:
-            weights_layer3 = np.loadtxt(file)
-        with open('hidden_layer3_biases.txt', 'r') as file:
-            biases_layer3 = np.loadtxt(file)
-            biases_layer3 = biases_layer3.reshape(1, 86)
+        string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
+        folder_path = os.path.join(os.getcwd(), string)
+
+        if not os.path.exists(folder_path):
+            print('No weights found for this configurarion!')
+            exit()
+        else:
+            most_recent_folder = get_most_recent_folder(folder_path)
+            folder_path = os.path.join(folder_path, most_recent_folder)
+
+            weights_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'))
+            biases_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'))
+            biases_layer1 = biases_layer1.reshape(1, size_hidden_layers)
+
+            weights_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'))
+            biases_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'))
+            biases_layer2 = biases_layer2.reshape(1, size_hidden_layers)
+
+            weights_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'))
+            biases_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'))
+            biases_layer3 = biases_layer3.reshape(1, number_of_outputs)
+
     elif weight_option == 2:
         weights_layer1 = None
         biases_layer1 = None
@@ -177,7 +213,7 @@ def load_training_data():
     global training_inputs
     global training_targets
 
-    with open('database.json', 'r') as file:
+    with open('Database\database.json', 'r') as file:
         training_data_list = json.load(file)
 
     # Extract inputs and targets from the list of objects
@@ -196,13 +232,13 @@ def initialize_objects():
     global loss_activation
     global optimizer
 
-    hidden_layer1 = layer_dense(42, 128, weights_layer1, biases_layer1) # From input layer to hidden layer 1
-    hidden_layer2 = layer_dense(128, 128, weights_layer2, biases_layer2) # From hidden layer 1 to hidden layer 2
-    hidden_layer3 = layer_dense(128, 25, weights_layer3, biases_layer3) # From hidden layer 2 to hidden layer 3
+    hidden_layer1 = layer_dense(number_of_inputs, size_hidden_layers, weights_layer1, biases_layer1) # From input layer to hidden layer 1
+    hidden_layer2 = layer_dense(size_hidden_layers, size_hidden_layers, weights_layer2, biases_layer2) # From hidden layer 1 to hidden layer 2
+    hidden_layer3 = layer_dense(size_hidden_layers, number_of_outputs, weights_layer3, biases_layer3) # From hidden layer 2 to hidden layer 3
 
     activation1 = Activation_ReLU()
     loss_activation = Activation_Softmax_Loss_CategoricalCrossentropy()
-    optimizer = Optimizer_SGD(0.001)
+    optimizer = Optimizer_SGD(learning_rate)
 
 
 def train_data():
@@ -216,7 +252,7 @@ def train_data():
     global optimizer
 
     last_loss = float('inf')
-    for epoch in range(1001):
+    for epoch in range(number_of_epochs):
         # Forward pass
         hidden_layer1.forward(training_inputs)
         activation1.forward(hidden_layer1.output)
@@ -253,22 +289,69 @@ def train_data():
                 last_loss = loss
 
 
-def save_weights():
-    np.savetxt('hidden_layer1_weights.txt', hidden_layer1.weights)
-    np.savetxt('hidden_layer1_biases.txt', hidden_layer1.biases)
-    np.savetxt('hidden_layer2_weights.txt', hidden_layer2.weights)
-    np.savetxt('hidden_layer2_biases.txt', hidden_layer2.biases)
-    np.savetxt('hidden_layer3_weights.txt', hidden_layer3.weights)
-    np.savetxt('hidden_layer3_biases.txt', hidden_layer3.biases)
+def save_weights(folder_path):
+    np.savetxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'), hidden_layer1.weights)
+    np.savetxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'), hidden_layer1.biases)
+    np.savetxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'), hidden_layer2.weights)
+    np.savetxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'), hidden_layer2.biases)
+    np.savetxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'), hidden_layer3.weights)
+    np.savetxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'), hidden_layer3.biases)
+
+
+def create_folder_for_weights():
+    # Get the current directory
+    current_directory = os.getcwd()
+    folder_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    # Name of the folder, will be the number of hidden layers and the size of the hidden layers
+    string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
+
+    # Create the path to the weights directory
+    weights_directory = os.path.join(current_directory, string)
+    if not os.path.exists(os.path.join(current_directory, string)):
+        os.makedirs(os.path.join(current_directory, string))
+
+    # Create the path to the new folder inside the weights directory
+    folder_path = os.path.join(weights_directory, folder_name)
+
+    # Check if the folder does not exist
+    if not os.path.exists(folder_path):
+        # Use os.makedirs to create the folder
+        os.makedirs(folder_path)
+    
+    return folder_path
+
+
+def get_most_recent_folder(folder_path):
+    # Get a list of folders in the specified directory
+    folders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
+
+    # If there are no folders, return None
+    if not folders:
+        return None
+
+    # Convert folder names to datetime objects
+    folders_dates = [datetime.datetime.strptime(f, "%Y-%m-%d_%H-%M-%S") for f in folders]
+
+    # Find the most recent folder
+    most_recent_folder = max(folders_dates)
+
+    # Convert the datetime object back to the folder name
+    most_recent_folder_name = most_recent_folder.strftime("%Y-%m-%d_%H-%M-%S")
+
+    return most_recent_folder_name
 
 
 def main():
+    load_configurarions()
     weight_option = ask_user_weights()
     initialize_weights(weight_option)
     load_training_data()
     initialize_objects()
     train_data()
-    save_weights()
+    folder_path = create_folder_for_weights()
+    print(folder_path)
+    save_weights(folder_path)
 
 
 main()

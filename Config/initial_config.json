@@ -1,0 +1,8 @@
+{
+    "number_of_inputs": 42,
+    "number_of_outputs": 25,
+    "size_hidden_layers": 16,
+    "number_of_hidden_layers": 2,
+    "learning_rate": 0.01,
+    "number_of_epochs": 2001 
+}
