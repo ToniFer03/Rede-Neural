@@ -32,7 +32,6 @@ loss_activation = None
 optimizer = None
 
 
-
 np.random.seed(0)
 class layer_dense:
     def __init__(self, n_inputs, n_neurons, custom_weights=None, custom_biases=None):
@@ -138,6 +137,20 @@ class Optimizer_SGD:
         self.learning_rate = new_learning_rate
 
 
+
+
+# load_configurations is the function responsible for loading the configurations from the configuration file
+#
+#   How it works:
+#   - Funtion opens the configuration file, loads the configurations to the respective global 
+#     variables and closes the file
+#
+#   Parameters:
+#   - Doesnt receive any parameters
+#
+#   Returns:
+#   - Doesnt return anything
+#
 def load_configurarions():
     global number_of_inputs
     global number_of_outputs
@@ -157,6 +170,18 @@ def load_configurarions():
     number_of_epochs = configurations['number_of_epochs']
 
 
+
+# ask_user_weights is the function responsible for asking the user if he wants to load the weights or use random weights
+#
+#   How it works:
+#   - Function prints the options to the user and waits for an input
+#
+#   Parameters:
+#   - Doesnt receive any parameters
+#
+#   Returns:
+#   - Returns the option chosen by the user
+#
 def ask_user_weights():
     print('Load weigths or use random weights?')
     print('1 - Load weights')
@@ -167,6 +192,23 @@ def ask_user_weights():
     return option
 
 
+
+# initialize_weights is the function responsible for initializing the weights and biases
+#
+#   How it works:
+#   - If the user chooses to load weights, the function will first verify if there are any weights
+#     for the specified configuration. If there are, it will load the most recent weights. If there
+#     are no weights, the program will warn the user and exit.
+#   - If the user chooses to use random weights, the function will initialize the weights and biases
+#     with random values.
+#   - If the user chooses to exit, the program will exit.
+#
+#   Parameters:
+#   - weight_option: option chosen by the user
+#
+#   Returns:
+#   - Doesnt return anything
+#
 def initialize_weights(weight_option):
     global weights_layer1
     global biases_layer1
@@ -209,6 +251,19 @@ def initialize_weights(weight_option):
         exit()
 
 
+
+# load_training_data is the function responsible for loading the training data from the database
+#
+#   How it works:
+#   - Function opens the database file, loads the training data to the respective global
+#     variables and closes the file
+#
+#   Parameters:
+#   - Doesnt receive any parameters
+#
+#   Returns:
+#   - Doesnt return anything
+#
 def load_training_data():
     global training_inputs
     global training_targets
@@ -224,6 +279,18 @@ def load_training_data():
     training_targets = np.array(training_targets)
 
 
+
+# initialize_objects is the function responsible for initializing the objects
+#
+#   How it works:
+#   - Function initializes the objects with the respective parameters
+#
+#   Parameters:
+#   - Doesnt receive any parameters
+#
+#   Returns:
+#   - Doesnt return anything
+#
 def initialize_objects():
     global hidden_layer1
     global hidden_layer2
@@ -232,15 +299,30 @@ def initialize_objects():
     global loss_activation
     global optimizer
 
-    hidden_layer1 = layer_dense(number_of_inputs, size_hidden_layers, weights_layer1, biases_layer1) # From input layer to hidden layer 1
-    hidden_layer2 = layer_dense(size_hidden_layers, size_hidden_layers, weights_layer2, biases_layer2) # From hidden layer 1 to hidden layer 2
-    hidden_layer3 = layer_dense(size_hidden_layers, number_of_outputs, weights_layer3, biases_layer3) # From hidden layer 2 to hidden layer 3
+    hidden_layer1 = layer_dense(number_of_inputs, size_hidden_layers, weights_layer1, biases_layer1) 
+    hidden_layer2 = layer_dense(size_hidden_layers, size_hidden_layers, weights_layer2, biases_layer2) 
+    hidden_layer3 = layer_dense(size_hidden_layers, number_of_outputs, weights_layer3, biases_layer3)
 
     activation1 = Activation_ReLU()
     loss_activation = Activation_Softmax_Loss_CategoricalCrossentropy()
     optimizer = Optimizer_SGD(learning_rate)
 
 
+
+# train_data is the function responsible for training the data
+#
+#   How it works:
+#   - Function trains the data loaded from the database, using the objects initialized
+#     in the previous function. Uses the forward method to calculate the output and the
+#     backward method to calculate the gradients and update the weights and biases. If 
+#     the loss is greater than the last loss, the learning rate is decreased.
+#
+#   Parameters:
+#   - Doesnt receive any parameters
+#
+#   Returns:
+#   - Doesnt return anything
+#
 def train_data():
     global training_inputs
     global training_targets
@@ -289,6 +371,17 @@ def train_data():
                 last_loss = loss
 
 
+
+# save_weights is the function responsible for saving the weights and biases to a file
+#
+#   How it works:
+#   - Function saves the weights and biases to a file
+#
+#   Parameters:
+#   - folder_path: path to the folder where the weights will be saved
+#
+#   Returns:
+#   - Doesnt return anything
 def save_weights(folder_path):
     np.savetxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'), hidden_layer1.weights)
     np.savetxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'), hidden_layer1.biases)
@@ -298,45 +391,62 @@ def save_weights(folder_path):
     np.savetxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'), hidden_layer3.biases)
 
 
+
+# create_folder_for_weights is the function responsible for creating a folder to save the weights
+#
+#   How it works:
+#   - Function creates a variable that holds the current timestamp. Verifies if a folder 
+#   for this neural network configuration already exists. If it doesnt, it creates a folder 
+#   for the current configuration with the name "Weights_number_of_hidden_layers_size_hidden_layers".
+#   Then, it creates a folder inside the previous folder with the current timestamp as the name.
+#
+#   Parameters:
+#   - Doesnt receive any parameters
+#
+#   Returns:
+#   - Returns the path to the folder where the weights will be saved
+#
 def create_folder_for_weights():
-    # Get the current directory
     current_directory = os.getcwd()
     folder_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    # Name of the folder, will be the number of hidden layers and the size of the hidden layers
     string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
 
-    # Create the path to the weights directory
     weights_directory = os.path.join(current_directory, string)
     if not os.path.exists(os.path.join(current_directory, string)):
         os.makedirs(os.path.join(current_directory, string))
 
-    # Create the path to the new folder inside the weights directory
     folder_path = os.path.join(weights_directory, folder_name)
 
-    # Check if the folder does not exist
     if not os.path.exists(folder_path):
-        # Use os.makedirs to create the folder
         os.makedirs(folder_path)
     
     return folder_path
 
 
+
+# get_most_recent_folder is the function responsible for getting the most recent folder
+#
+#   How it works:
+#   - Function saves the names of all the folders inside the specified folder to a list. Then,
+#   it converts the names to datetime objects and gets the most recent folder.
+#
+#   Parameters:
+#   - folder_path: path to the folder where the weights for a certain configuration are saved
+#
+#   Returns:
+#   - Returns the name of the most recent folder
+#
 def get_most_recent_folder(folder_path):
-    # Get a list of folders in the specified directory
     folders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
 
-    # If there are no folders, return None
     if not folders:
         return None
 
-    # Convert folder names to datetime objects
     folders_dates = [datetime.datetime.strptime(f, "%Y-%m-%d_%H-%M-%S") for f in folders]
 
-    # Find the most recent folder
     most_recent_folder = max(folders_dates)
 
-    # Convert the datetime object back to the folder name
     most_recent_folder_name = most_recent_folder.strftime("%Y-%m-%d_%H-%M-%S")
 
     return most_recent_folder_name
