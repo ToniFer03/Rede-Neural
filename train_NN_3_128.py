@@ -4,57 +4,22 @@ import json
 training_inputs = []
 training_targets = []
 
+# Weights and biases variables
 weights_layer1 = None
 biases_layer1 = None
 weights_layer2 = None
 biases_layer2 = None
 weights_layer3 = None
 biases_layer3 = None
-weights_layer4 = None
-biases_layer4 = None
 
-# Load weights and biases
+# Objects
+hidden_layer1 = None
+hidden_layer2 = None
+hidden_layer3 = None
+activation1 = None
+loss_activation = None
+optimizer = None
 
-with open('hidden_layer1_weights.txt', 'r') as file:
-    weights_layer1 = np.loadtxt(file)
-with open('hidden_layer1_biases.txt', 'r') as file:
-    biases_layer1 = np.loadtxt(file)
-    biases_layer1 = biases_layer1.reshape(1, 86)
-with open('hidden_layer2_weights.txt', 'r') as file:
-    weights_layer2 = np.loadtxt(file)
-with open('hidden_layer2_biases.txt', 'r') as file:
-    biases_layer2 = np.loadtxt(file)
-    biases_layer2 = biases_layer2.reshape(1, 86)
-with open('hidden_layer3_weights.txt', 'r') as file:
-    weights_layer3 = np.loadtxt(file)
-with open('hidden_layer3_biases.txt', 'r') as file:
-    biases_layer3 = np.loadtxt(file)
-    biases_layer3 = biases_layer3.reshape(1, 86)
-with open('hidden_layer4_weights.txt', 'r') as file:
-    weights_layer4 = np.loadtxt(file)
-with open('hidden_layer4_biases.txt', 'r') as file:
-    biases_layer4 = np.loadtxt(file)
-    biases_layer4 = biases_layer4.reshape(1, 25)
-
-
-
-def load_training_data():
-    global training_inputs
-    global training_targets
-
-    with open('database.json', 'r') as file:
-        training_data_list = json.load(file)
-
-    # Extract inputs and targets from the list of objects
-    training_inputs = [obj['inputs'] for obj in training_data_list]
-    training_targets = [obj['targets'] for obj in training_data_list]
-
-
-
-
-load_training_data()
-training_inputs = np.array(training_inputs)
-trainig_outputs = np.array(training_targets)
 
 
 np.random.seed(0)
@@ -77,7 +42,6 @@ class layer_dense:
         self.dinputs = np.dot(dvalues, self.weights.T)
 
 
-
 class Activation_ReLU:
     def forward(self, inputs):
         self.output = np.maximum(0, inputs)
@@ -86,7 +50,6 @@ class Activation_ReLU:
     def backward(self, dvalues):
         self.dinputs = dvalues.copy()
         self.dinputs[self.inputs <= 0] = 0
-
 
 
 class Activation_Softmax:
@@ -104,13 +67,11 @@ class Activation_Softmax:
             self.dinputs[index] = np.dot(jacobian_matrix, single_dvalues)
 
 
-
 class Loss:
     def calculate(self, output, y): # y is the target values
         sample_losses = self.forward(output, y) 
         data_loss = np.mean(sample_losses)
         return data_loss
-
 
 
 class Loss_CategoricalCrossentropy(Loss):
@@ -136,7 +97,6 @@ class Loss_CategoricalCrossentropy(Loss):
         self.dinputs = self.dinputs / samples
 
 
-
 class Activation_Softmax_Loss_CategoricalCrossentropy():
     def __init__(self):
         self.activation = Activation_Softmax()
@@ -156,7 +116,6 @@ class Activation_Softmax_Loss_CategoricalCrossentropy():
         self.dinputs = self.dinputs / samples
 
 
-
 class Optimizer_SGD:
     global learning_rate
     def __init__(self, learning_rate):
@@ -168,76 +127,149 @@ class Optimizer_SGD:
         self.learning_rate = new_learning_rate
 
 
-hidden_layer1 = layer_dense(42, 128, weights_layer1, biases_layer1) # From input layer to hidden layer 1
-hidden_layer2 = layer_dense(128, 128, weights_layer2, biases_layer2) # From hidden layer 1 to hidden layer 2
-hidden_layer3 = layer_dense(128, 128, weights_layer3, biases_layer3) # From hidden layer 2 to hidden layer 3
-hidden_layer4 = layer_dense(128, 25, weights_layer4, biases_layer4) # From hidden layer 3 to hidden layer 4
 
-'''
-hidden_layer1 = layer_dense(42, 86) # From input layer to hidden layer 1
-hidden_layer2 = layer_dense(86, 86) # From hidden layer 1 to hidden layer 2
-hidden_layer3 = layer_dense(86, 86) # From hidden layer 2 to hidden layer 3
-hidden_layer4 = layer_dense(86, 25) # From hidden layer 3 to hidden layer 4
-'''
+def ask_user_weights():
+    print('Load weigths or use random weights?')
+    print('1 - Load weights')
+    print('2 - Random weights')
+    print('3 - Exit')
+    option = int(input())
+
+    return option
 
 
-activation1 = Activation_ReLU()
-loss_activation = Activation_Softmax_Loss_CategoricalCrossentropy()
-optimizer = Optimizer_SGD(0.001)
-
-
-last_loss = 9999999
-for epoch in range(10001):
-    # Forward pass
-    hidden_layer1.forward(training_inputs)
-    activation1.forward(hidden_layer1.output)
-
-    hidden_layer2.forward(activation1.output)
-    activation1.forward(hidden_layer2.output)
-
-    hidden_layer3.forward(activation1.output)
-    activation1.forward(hidden_layer3.output)
-
-    hidden_layer4.forward(activation1.output)
-    loss = loss_activation.forward(hidden_layer4.output, trainig_outputs)
-
-    if not epoch % 1000:
-        print(f'loss: {loss}')
-        print(f'epoch: {epoch}')
-
-    # Backward pass
-    loss_activation.backward(loss_activation.output, trainig_outputs)
-    hidden_layer4.backward(loss_activation.dinputs)
-
-    activation1.backward(hidden_layer4.dinputs)
-    hidden_layer3.backward(activation1.dinputs)
+def initialize_weights(weight_option):
+    global weights_layer1
+    global biases_layer1
+    global weights_layer2
+    global biases_layer2
+    global weights_layer3
+    global biases_layer3
     
-    activation1.backward(hidden_layer3.dinputs)
-    hidden_layer2.backward(activation1.dinputs)
-    
-    activation1.backward(hidden_layer2.dinputs)
-    hidden_layer1.backward(activation1.dinputs)
+    if weight_option == 1:
+        with open('hidden_layer1_weights.txt', 'r') as file:
+            weights_layer1 = np.loadtxt(file)
+        with open('hidden_layer1_biases.txt', 'r') as file:
+            biases_layer1 = np.loadtxt(file)
+            biases_layer1 = biases_layer1.reshape(1, 86)
+        with open('hidden_layer2_weights.txt', 'r') as file:
+            weights_layer2 = np.loadtxt(file)
+        with open('hidden_layer2_biases.txt', 'r') as file:
+            biases_layer2 = np.loadtxt(file)
+            biases_layer2 = biases_layer2.reshape(1, 86)
+        with open('hidden_layer3_weights.txt', 'r') as file:
+            weights_layer3 = np.loadtxt(file)
+        with open('hidden_layer3_biases.txt', 'r') as file:
+            biases_layer3 = np.loadtxt(file)
+            biases_layer3 = biases_layer3.reshape(1, 86)
+    elif weight_option == 2:
+        weights_layer1 = None
+        biases_layer1 = None
+        weights_layer2 = None
+        biases_layer2 = None
+        weights_layer3 = None
+        biases_layer3 = None
+    elif weight_option == 3:
+        exit()
 
-    # Update weights and biases
-    optimizer.update_params(hidden_layer1)
-    optimizer.update_params(hidden_layer2)
-    optimizer.update_params(hidden_layer3)
-    optimizer.update_params(hidden_layer4)
 
-    if(epoch % 250 == 0):
-        if loss > last_loss:
-            optimizer.update_learning_rate(optimizer.learning_rate * 0.66)
-        else:
-            last_loss = loss
+def load_training_data():
+    global training_inputs
+    global training_targets
 
-# Save weights and biases
-np.savetxt('hidden_layer1_weights.txt', hidden_layer1.weights)
-np.savetxt('hidden_layer1_biases.txt', hidden_layer1.biases)
-np.savetxt('hidden_layer2_weights.txt', hidden_layer2.weights)
-np.savetxt('hidden_layer2_biases.txt', hidden_layer2.biases)
-np.savetxt('hidden_layer3_weights.txt', hidden_layer3.weights)
-np.savetxt('hidden_layer3_biases.txt', hidden_layer3.biases)
-np.savetxt('hidden_layer4_weights.txt', hidden_layer4.weights)
-np.savetxt('hidden_layer4_biases.txt', hidden_layer4.biases)
+    with open('database.json', 'r') as file:
+        training_data_list = json.load(file)
 
+    # Extract inputs and targets from the list of objects
+    training_inputs = [obj['inputs'] for obj in training_data_list]
+    training_targets = [obj['targets'] for obj in training_data_list]
+
+    training_inputs = np.array(training_inputs)
+    training_targets = np.array(training_targets)
+
+
+def initialize_objects():
+    global hidden_layer1
+    global hidden_layer2
+    global hidden_layer3
+    global activation1
+    global loss_activation
+    global optimizer
+
+    hidden_layer1 = layer_dense(42, 128, weights_layer1, biases_layer1) # From input layer to hidden layer 1
+    hidden_layer2 = layer_dense(128, 128, weights_layer2, biases_layer2) # From hidden layer 1 to hidden layer 2
+    hidden_layer3 = layer_dense(128, 25, weights_layer3, biases_layer3) # From hidden layer 2 to hidden layer 3
+
+    activation1 = Activation_ReLU()
+    loss_activation = Activation_Softmax_Loss_CategoricalCrossentropy()
+    optimizer = Optimizer_SGD(0.001)
+
+
+def train_data():
+    global training_inputs
+    global training_targets
+    global hidden_layer1
+    global hidden_layer2
+    global hidden_layer3
+    global activation1
+    global loss_activation
+    global optimizer
+
+    last_loss = float('inf')
+    for epoch in range(1001):
+        # Forward pass
+        hidden_layer1.forward(training_inputs)
+        activation1.forward(hidden_layer1.output)
+
+        hidden_layer2.forward(activation1.output)
+        activation1.forward(hidden_layer2.output)
+
+        hidden_layer3.forward(activation1.output)
+        loss = loss_activation.forward(hidden_layer3.output, training_targets)
+
+        if not epoch % 100:
+            print(f'loss: {loss}')
+            print(f'epoch: {epoch}')
+
+        # Backward pass
+        loss_activation.backward(loss_activation.output, training_targets)
+        hidden_layer3.backward(loss_activation.dinputs)
+        
+        activation1.backward(hidden_layer3.dinputs)
+        hidden_layer2.backward(activation1.dinputs)
+        
+        activation1.backward(hidden_layer2.dinputs)
+        hidden_layer1.backward(activation1.dinputs)
+
+        # Update weights and biases
+        optimizer.update_params(hidden_layer1)
+        optimizer.update_params(hidden_layer2)
+        optimizer.update_params(hidden_layer3)
+
+        if(epoch % 250 == 0):
+            if loss > last_loss:
+                optimizer.update_learning_rate(optimizer.learning_rate * 0.66)
+            else:
+                last_loss = loss
+
+
+def save_weights():
+    np.savetxt('hidden_layer1_weights.txt', hidden_layer1.weights)
+    np.savetxt('hidden_layer1_biases.txt', hidden_layer1.biases)
+    np.savetxt('hidden_layer2_weights.txt', hidden_layer2.weights)
+    np.savetxt('hidden_layer2_biases.txt', hidden_layer2.biases)
+    np.savetxt('hidden_layer3_weights.txt', hidden_layer3.weights)
+    np.savetxt('hidden_layer3_biases.txt', hidden_layer3.biases)
+
+
+def main():
+    weight_option = ask_user_weights()
+    initialize_weights(weight_option)
+    load_training_data()
+    initialize_objects()
+    train_data()
+    save_weights()
+
+
+main()
 
