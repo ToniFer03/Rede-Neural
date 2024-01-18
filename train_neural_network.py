@@ -14,6 +14,7 @@ size_hidden_layers = None
 number_of_hidden_layers = None
 learning_rate = None
 number_of_epochs = None
+loss = None
 
 # Weights and biases variables
 weights_layer1 = None
@@ -198,7 +199,8 @@ def ask_user_weights():
 #   How it works:
 #   - If the user chooses to load weights, the function will first verify if there are any weights
 #     for the specified configuration. If there are, it will load the most recent weights. If there
-#     are no weights, the program will warn the user and exit.
+#     are no weights, the program will warn the user and exit. It will also load the learning rate
+#     from the most recent folder.
 #   - If the user chooses to use random weights, the function will initialize the weights and biases
 #     with random values.
 #   - If the user chooses to exit, the program will exit.
@@ -216,6 +218,7 @@ def initialize_weights(weight_option):
     global biases_layer2
     global weights_layer3
     global biases_layer3
+    global learning_rate
 
     if weight_option == 1:
         string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
@@ -239,6 +242,8 @@ def initialize_weights(weight_option):
             weights_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'))
             biases_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'))
             biases_layer3 = biases_layer3.reshape(1, number_of_outputs)
+
+            learning_rate = np.loadtxt(os.path.join(folder_path, 'learning_rate.txt'))
 
     elif weight_option == 2:
         weights_layer1 = None
@@ -332,6 +337,7 @@ def train_data():
     global activation1
     global loss_activation
     global optimizer
+    global loss
 
     last_loss = float('inf')
     for epoch in range(number_of_epochs):
@@ -345,9 +351,13 @@ def train_data():
         hidden_layer3.forward(activation1.output)
         loss = loss_activation.forward(hidden_layer3.output, training_targets)
 
-        if not epoch % 100:
+        if not epoch % 1000:
             print(f'loss: {loss}')
+            print(f'learning_rate: {optimizer.learning_rate}')
             print(f'epoch: {epoch}')
+
+            if optimizer.learning_rate < 0.00000000000000001:
+                return
 
         # Backward pass
         loss_activation.backward(loss_activation.output, training_targets)
@@ -389,6 +399,8 @@ def save_weights(folder_path):
     np.savetxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'), hidden_layer2.biases)
     np.savetxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'), hidden_layer3.weights)
     np.savetxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'), hidden_layer3.biases)
+    np.savetxt(os.path.join(folder_path, 'learning_rate.txt'), np.array([optimizer.learning_rate]))
+    np.savetxt(os.path.join(folder_path, 'loss.txt'), np.array([loss]))
 
 
 
@@ -460,7 +472,6 @@ def main():
     initialize_objects()
     train_data()
     folder_path = create_folder_for_weights()
-    print(folder_path)
     save_weights(folder_path)
 
 
