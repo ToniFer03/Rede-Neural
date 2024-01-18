@@ -17,6 +17,7 @@ number_of_epochs = None
 loss = None
 best_loss = float('inf')
 rate_of_decrease = None
+patiente = None
 
 # Weights and biases variables
 weights_layer1 = None
@@ -55,6 +56,7 @@ def load_configurarions():
     global learning_rate
     global number_of_epochs
     global rate_of_decrease
+    global patiente
 
     with open('Config\initial_config.json', 'r') as file:
         configurations = json.load(file)
@@ -66,6 +68,7 @@ def load_configurarions():
     learning_rate = configurations['learning_rate']
     rate_of_decrease = configurations['rate_of_decrease']
     number_of_epochs = configurations['number_of_epochs']
+    patiente = configurations['patiente']
 
 
 
@@ -237,8 +240,9 @@ def train_data():
     global loss
     global best_loss
     global rate_of_decrease
+    global patiente
 
-    last_loss = float('inf')
+    count = 0
     for epoch in range(number_of_epochs):
         # Forward pass
         hidden_layer1.forward(training_inputs)
@@ -279,11 +283,16 @@ def train_data():
         optimizer.update_params(hidden_layer2)
         optimizer.update_params(hidden_layer3)
 
-        if(epoch % 250 == 0):
-            if loss > last_loss:
-                optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)
-            else:
-                last_loss = loss
+        if loss < best_loss:
+            best_loss = loss
+        else:
+            count += 1
+        
+        if patiente == count:
+            count = 0
+            optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)
+        
+        
 
 
 
