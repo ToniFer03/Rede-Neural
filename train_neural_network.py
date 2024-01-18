@@ -15,6 +15,7 @@ number_of_hidden_layers = None
 learning_rate = None
 number_of_epochs = None
 loss = None
+best_loss = float('inf')
 
 # Weights and biases variables
 weights_layer1 = None
@@ -351,12 +352,18 @@ def train_data():
         hidden_layer3.forward(activation1.output)
         loss = loss_activation.forward(hidden_layer3.output, training_targets)
 
+        if loss < best_loss:
+            best_loss = loss
+
         if not epoch % 1000:
             print(f'loss: {loss}')
             print(f'learning_rate: {optimizer.learning_rate}')
             print(f'epoch: {epoch}')
 
             if optimizer.learning_rate < 0.00000000000000001:
+                if loss > best_loss:
+                    print('Not optimal: ', loss, ' > ', best_loss)
+                    break
                 return
 
         # Backward pass
