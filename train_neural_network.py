@@ -18,7 +18,6 @@ number_of_epochs = None
 loss = None
 best_loss = float('inf')
 rate_of_decrease = None
-patience = None
 
 # Weights and biases variables
 weights_layer1 = None
@@ -62,7 +61,6 @@ def load_configurarions():
     global learning_rate
     global number_of_epochs
     global rate_of_decrease
-    global patience
     global debug_logger
 
     try:
@@ -85,7 +83,6 @@ def load_configurarions():
     learning_rate = configurations['learning_rate']
     rate_of_decrease = configurations['rate_of_decrease']
     number_of_epochs = configurations['number_of_epochs']
-    patience = configurations['patience']
 
 
 
@@ -339,9 +336,7 @@ def train_data():
     global loss
     global best_loss
     global rate_of_decrease
-    global patience
 
-    count = 0
     for epoch in range(number_of_epochs):
         # Forward pass
         hidden_layer1.forward(training_inputs)
@@ -353,14 +348,14 @@ def train_data():
         hidden_layer3.forward(activation1.output)
         loss = loss_activation.forward(hidden_layer3.output, training_targets)
 
-        if not epoch % 1000:
+        if epoch % 1000 == 0:
             print(f'loss: {loss}')
             print(f'learning_rate: {optimizer.learning_rate}')
             print(f'epoch: {epoch}')
-
-            if optimizer.learning_rate < 0.00000000000000001:
-                debug_logger.debug('Leaning rate too low. Epoch: ', epoch)
-                return
+        
+        if optimizer.learning_rate < 0.00000000000000001:
+            debug_logger.debug(f'Leaning rate too low. Epoch: {epoch}')
+            return
 
         # Backward pass
         loss_activation.backward(loss_activation.output, training_targets)
@@ -379,18 +374,16 @@ def train_data():
 
         debug_logger.debug(f'Epoch: {epoch} - Loss: {loss} - Learning rate: {optimizer.learning_rate}')
 
-        if loss < best_loss:
-            best_loss = loss
-            count = 0
-        else:
-            debug_logger.debug(f'Loss increased.')
-            count += 1
-        
-        if patience == count:
-            debug_logger.debug(f'Loss increased {patience} times. Decreasing learning rate.')
-            count = 0
-            best_loss = float('inf')
-            optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)
+        if epoch % 250 == 0:
+            if loss < best_loss:
+                best_loss = loss
+            else:
+                debug_logger.debug(f'Loss increased. Decreasing learning rate.')
+                best_loss = float('inf')
+                optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)
+    
+    debug_logger.debug(f'Maximum number of epochs reached. Epoch: {epoch}')
+            
         
 
 

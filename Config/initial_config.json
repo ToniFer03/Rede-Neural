@@ -4,7 +4,6 @@
     "size_hidden_layers": 32,
     "number_of_hidden_layers": 2,
     "learning_rate": 0.01,
-    "rate_of_decrease": 0.1,
-    "number_of_epochs": 1000001,
-    "patience": 100
+    "rate_of_decrease": 0.5,
+    "number_of_epochs": 1000001
 }
