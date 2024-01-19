@@ -3,6 +3,7 @@ import numpy as np
 import json
 import os
 import classes
+import logging
 
 training_inputs = []
 training_targets = []
@@ -17,7 +18,7 @@ number_of_epochs = None
 loss = None
 best_loss = float('inf')
 rate_of_decrease = None
-patiente = None
+patience = None
 
 # Weights and biases variables
 weights_layer1 = None
@@ -56,11 +57,21 @@ def load_configurarions():
     global learning_rate
     global number_of_epochs
     global rate_of_decrease
-    global patiente
+    global patience
 
-    with open('Config\initial_config.json', 'r') as file:
-        configurations = json.load(file)
+    try:
+        with open('Config\\initial_config.json', 'r') as file:
+            configurations = json.load(file)
+        # Continue with processing the configurations if the file was successfully loaded
+        logging.info('JSON file loaded successfully.')
+    except FileNotFoundError:
+        logging.error('File not found: Config\\initial_config.json')
+    except json.JSONDecodeError as e:
+        logging.error(f'Error decoding JSON: {e}')
+    except Exception as e:
+        logging.error(f'An unexpected error occurred: {e}')
 
+    
     number_of_inputs = configurations['number_of_inputs']
     number_of_outputs = configurations['number_of_outputs']
     size_hidden_layers = configurations['size_hidden_layers']
@@ -68,7 +79,61 @@ def load_configurarions():
     learning_rate = configurations['learning_rate']
     rate_of_decrease = configurations['rate_of_decrease']
     number_of_epochs = configurations['number_of_epochs']
-    patiente = configurations['patiente']
+    patience = configurations['patience']
+
+
+
+# logging_config is the function responsible for configuring the logging module
+#
+#   How it works:
+#   - Function creates a folder for the logs. Then, it creates loggers for each level and file handlers
+#     for each logger. It also creates a formatter for the log messages. Finally, it adds the handlers
+#     to the loggers and tests logging at different levels.
+#
+#   Parameters:
+#   - Doesnt receive any parameters
+#
+#   Returns:
+#   - Doesnt return anything
+#
+def logging_config():
+    folder_path = create_folder_for_logs()
+
+    # Remove the basic configuration for the root logger
+    logging.root.handlers = []
+
+    # Create loggers for different levels
+    debug_logger = logging.getLogger('debug_logger')
+    warning_logger = logging.getLogger('warning_logger')
+    error_logger = logging.getLogger('error_logger')
+
+    # Create file handlers for each logger
+    debug_handler = logging.FileHandler(os.path.join(folder_path, 'debug.log'))
+    warning_handler = logging.FileHandler(os.path.join(folder_path, 'warning.log'))
+    error_handler = logging.FileHandler(os.path.join(folder_path, 'error.log'))
+
+    # Set the logging levels for each handler
+    debug_handler.setLevel(logging.DEBUG)
+    warning_handler.setLevel(logging.WARNING)
+    error_handler.setLevel(logging.ERROR)
+
+    # Create a formatter for the log messages
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+    # Set the formatter for each handler
+    debug_handler.setFormatter(formatter)
+    warning_handler.setFormatter(formatter)
+    error_handler.setFormatter(formatter)
+
+    # Add the handlers to the loggers
+    debug_logger.addHandler(debug_handler)
+    warning_logger.addHandler(warning_handler)
+    error_logger.addHandler(error_handler)
+
+    # Test logging at different levels
+    debug_logger.debug('Debug logger set up')
+    warning_logger.warning('Warning logger set up')
+    error_logger.error('Error logger set up')
 
 
 
@@ -89,6 +154,8 @@ def ask_user_weights():
     print('2 - Random weights')
     print('3 - Exit')
     option = int(input())
+    
+    logging.info(f'User chose option {option}')
 
     return option
 
@@ -125,25 +192,31 @@ def initialize_weights(weight_option):
         folder_path = os.path.join(os.getcwd(), string)
 
         if not os.path.exists(folder_path):
+            logging.warning(f'No weights found for this configurarion! {folder_path}')
             print('No weights found for this configurarion!')
             exit()
         else:
-            most_recent_folder = get_most_recent_folder(folder_path)
-            folder_path = os.path.join(folder_path, most_recent_folder)
+            try:
+                most_recent_folder = get_most_recent_folder(folder_path)
+                folder_path = os.path.join(folder_path, most_recent_folder)
 
-            weights_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'))
-            biases_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'))
-            biases_layer1 = biases_layer1.reshape(1, size_hidden_layers)
+                weights_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'))
+                biases_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'))
+                biases_layer1 = biases_layer1.reshape(1, size_hidden_layers)
 
-            weights_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'))
-            biases_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'))
-            biases_layer2 = biases_layer2.reshape(1, size_hidden_layers)
+                weights_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'))
+                biases_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'))
+                biases_layer2 = biases_layer2.reshape(1, size_hidden_layers)
 
-            weights_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'))
-            biases_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'))
-            biases_layer3 = biases_layer3.reshape(1, number_of_outputs)
+                weights_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'))
+                biases_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'))
+                biases_layer3 = biases_layer3.reshape(1, number_of_outputs)
 
-            learning_rate = np.loadtxt(os.path.join(folder_path, 'learning_rate.txt'))
+                learning_rate = np.loadtxt(os.path.join(folder_path, 'learning_rate.txt'))
+            except FileNotFoundError:
+                logging.error(f'File not found: {folder_path}')
+            except Exception as e:
+                logging.error(f'An unexpected error occurred: {e}')
 
     elif weight_option == 2:
         weights_layer1 = None
@@ -152,6 +225,7 @@ def initialize_weights(weight_option):
         biases_layer2 = None
         weights_layer3 = None
         biases_layer3 = None
+    
     elif weight_option == 3:
         exit()
 
@@ -173,9 +247,19 @@ def load_training_data():
     global training_inputs
     global training_targets
 
-    with open('Database\database.json', 'r') as file:
-        training_data_list = json.load(file)
+    try:
+        with open('Database\database.json', 'r') as file:
+            training_data_list = json.load(file)
+        # Continue with processing the configurations if the file was successfully loaded
+        logging.info('JSON file loaded successfully.')
+    except FileNotFoundError:
+        logging.error('File not found: Database\database.json')
+    except json.JSONDecodeError as e:
+        logging.error(f'Error decoding JSON: {e}')
+    except Exception as e:
+        logging.error(f'An unexpected error occurred: {e}')
 
+    
     # Extract inputs and targets from the list of objects
     training_inputs = [obj['inputs'] for obj in training_data_list]
     training_targets = [obj['targets'] for obj in training_data_list]
@@ -240,7 +324,7 @@ def train_data():
     global loss
     global best_loss
     global rate_of_decrease
-    global patiente
+    global patience
 
     count = 0
     for epoch in range(number_of_epochs):
@@ -254,18 +338,12 @@ def train_data():
         hidden_layer3.forward(activation1.output)
         loss = loss_activation.forward(hidden_layer3.output, training_targets)
 
-        if loss < best_loss:
-            best_loss = loss
-
         if not epoch % 1000:
             print(f'loss: {loss}')
             print(f'learning_rate: {optimizer.learning_rate}')
             print(f'epoch: {epoch}')
 
             if optimizer.learning_rate < 0.00000000000000001:
-                if loss > best_loss:
-                    print('Not optimal: ', loss, ' > ', best_loss)
-                    break
                 return
 
         # Backward pass
@@ -285,15 +363,15 @@ def train_data():
 
         if loss < best_loss:
             best_loss = loss
+            count = 0
         else:
             count += 1
         
-        if patiente == count:
+        if patience == count:
             count = 0
+            best_loss = float('inf')
             optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)
         
-        
-
 
 
 # save_weights is the function responsible for saving the weights and biases to a file
@@ -307,14 +385,17 @@ def train_data():
 #   Returns:
 #   - Doesnt return anything
 def save_weights(folder_path):
-    np.savetxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'), hidden_layer1.weights)
-    np.savetxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'), hidden_layer1.biases)
-    np.savetxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'), hidden_layer2.weights)
-    np.savetxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'), hidden_layer2.biases)
-    np.savetxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'), hidden_layer3.weights)
-    np.savetxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'), hidden_layer3.biases)
-    np.savetxt(os.path.join(folder_path, 'learning_rate.txt'), np.array([optimizer.learning_rate]))
-    np.savetxt(os.path.join(folder_path, 'loss.txt'), np.array([loss]))
+    try:
+        np.savetxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'), hidden_layer1.weights)
+        np.savetxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'), hidden_layer1.biases)
+        np.savetxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'), hidden_layer2.weights)
+        np.savetxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'), hidden_layer2.biases)
+        np.savetxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'), hidden_layer3.weights)
+        np.savetxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'), hidden_layer3.biases)
+        np.savetxt(os.path.join(folder_path, 'learning_rate.txt'), np.array([optimizer.learning_rate]))
+        np.savetxt(os.path.join(folder_path, 'loss.txt'), np.array([loss]))
+    except Exception as e:
+        logging.error(f'An unexpected error occurred: {e}')
 
 
 
@@ -340,9 +421,56 @@ def create_folder_for_weights():
 
     weights_directory = os.path.join(current_directory, string)
     if not os.path.exists(os.path.join(current_directory, string)):
-        os.makedirs(os.path.join(current_directory, string))
+        try:
+            os.makedirs(os.path.join(current_directory, string))
+        except PermissionError:
+            logging.error(f'Permission denied: {os.path.join(current_directory, string)}')
+        except OSError as e:
+            logging.error(f'OS error: {e}')
+        except Exception as e:
+            logging.error(f'An unexpected error occurred: {e}')
 
     folder_path = os.path.join(weights_directory, folder_name)
+
+    if not os.path.exists(folder_path):
+        try:
+            os.makedirs(folder_path)
+        except PermissionError:
+            logging.error(f'Permission denied: {folder_path}')
+        except OSError as e:
+            logging.error(f'OS error: {e}')
+        except Exception as e:
+            logging.error(f'An unexpected error occurred: {e}')
+    
+    return folder_path
+
+
+
+# create_folder_for_logs is the function responsible for creating a folder to save the logs
+#
+#   How it works:
+#   - Function creates a variable that holds the current timestamp. Verifies if a folder
+#   for the logs already exists. If it doesnt, it creates a folder for the logs with the
+#   name "Logs". Then, it creates a folder inside the previous folder with the current
+#   timestamp as the name.
+#
+#   Parameters:
+#   - Doesnt receive any parameters
+#
+#   Returns:
+#   - Returns the path to the folder where the logs will be saved
+#
+def create_folder_for_logs():
+    current_directory = os.getcwd()
+    folder_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    string = "Logs"
+
+    logs_directory = os.path.join(current_directory, string)
+    if not os.path.exists(os.path.join(current_directory, string)):
+        os.makedirs(os.path.join(current_directory, string))
+
+    folder_path = os.path.join(logs_directory, folder_name)
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
@@ -378,7 +506,9 @@ def get_most_recent_folder(folder_path):
     return most_recent_folder_name
 
 
+
 def main():
+    logging_config()
     load_configurarions()
     weight_option = ask_user_weights()
     initialize_weights(weight_option)
