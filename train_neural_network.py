@@ -36,6 +36,11 @@ activation1 = None
 loss_activation = None
 optimizer = None
 
+# Loggers
+debug_logger = None
+warning_logger = None
+error_logger = None
+
 
 # load_configurations is the function responsible for loading the configurations from the configuration file
 #
@@ -58,18 +63,19 @@ def load_configurarions():
     global number_of_epochs
     global rate_of_decrease
     global patience
+    global debug_logger
 
     try:
         with open('Config\\initial_config.json', 'r') as file:
             configurations = json.load(file)
         # Continue with processing the configurations if the file was successfully loaded
-        logging.info('JSON file loaded successfully.')
+        debug_logger.debug('JSON file loaded successfully: Config\\initial_config.json')
     except FileNotFoundError:
-        logging.error('File not found: Config\\initial_config.json')
+        error_logger.error('File not found: Config\\initial_config.json')
     except json.JSONDecodeError as e:
-        logging.error(f'Error decoding JSON: {e}')
+        error_logger.error(f'Error decoding JSON: {e}')
     except Exception as e:
-        logging.error(f'An unexpected error occurred: {e}')
+        error_logger.error(f'An unexpected error occurred: {e}')
 
     
     number_of_inputs = configurations['number_of_inputs']
@@ -97,10 +103,14 @@ def load_configurarions():
 #   - Doesnt return anything
 #
 def logging_config():
+    global debug_logger
+    global warning_logger
+    global error_logger
+
     folder_path = create_folder_for_logs()
 
     # Remove the basic configuration for the root logger
-    logging.root.handlers = []
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
     # Create loggers for different levels
     debug_logger = logging.getLogger('debug_logger')
@@ -149,13 +159,15 @@ def logging_config():
 #   - Returns the option chosen by the user
 #
 def ask_user_weights():
+    global debug_logger
+
     print('Load weigths or use random weights?')
     print('1 - Load weights')
     print('2 - Random weights')
     print('3 - Exit')
     option = int(input())
     
-    logging.info(f'User chose option {option}')
+    debug_logger.debug(f'User chose option {option}')
 
     return option
 
@@ -186,13 +198,16 @@ def initialize_weights(weight_option):
     global weights_layer3
     global biases_layer3
     global learning_rate
+    global debug_logger
+    global warning_logger
+    global error_logger
 
     if weight_option == 1:
         string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
         folder_path = os.path.join(os.getcwd(), string)
 
         if not os.path.exists(folder_path):
-            logging.warning(f'No weights found for this configurarion! {folder_path}')
+            warning_logger.warning(f'No weights found for this configurarion! {folder_path}')
             print('No weights found for this configurarion!')
             exit()
         else:
@@ -214,9 +229,9 @@ def initialize_weights(weight_option):
 
                 learning_rate = np.loadtxt(os.path.join(folder_path, 'learning_rate.txt'))
             except FileNotFoundError:
-                logging.error(f'File not found: {folder_path}')
+                error_logger.error(f'File not found: {folder_path}')
             except Exception as e:
-                logging.error(f'An unexpected error occurred: {e}')
+                error_logger.error(f'An unexpected error occurred: {e}')
 
     elif weight_option == 2:
         weights_layer1 = None
@@ -251,13 +266,13 @@ def load_training_data():
         with open('Database\database.json', 'r') as file:
             training_data_list = json.load(file)
         # Continue with processing the configurations if the file was successfully loaded
-        logging.info('JSON file loaded successfully.')
+        debug_logger.debug('JSON file loaded successfully.')
     except FileNotFoundError:
-        logging.error('File not found: Database\database.json')
+        error_logger.error('File not found: Database\database.json')
     except json.JSONDecodeError as e:
-        logging.error(f'Error decoding JSON: {e}')
+        error_logger.error(f'Error decoding JSON: {e}')
     except Exception as e:
-        logging.error(f'An unexpected error occurred: {e}')
+        error_logger.error(f'An unexpected error occurred: {e}')
 
     
     # Extract inputs and targets from the list of objects
@@ -344,6 +359,7 @@ def train_data():
             print(f'epoch: {epoch}')
 
             if optimizer.learning_rate < 0.00000000000000001:
+                debug_logger.debug('Leaning rate too low. Epoch: ', epoch)
                 return
 
         # Backward pass
@@ -361,13 +377,17 @@ def train_data():
         optimizer.update_params(hidden_layer2)
         optimizer.update_params(hidden_layer3)
 
+        debug_logger.debug(f'Epoch: {epoch} - Loss: {loss} - Learning rate: {optimizer.learning_rate}')
+
         if loss < best_loss:
             best_loss = loss
             count = 0
         else:
+            debug_logger.debug(f'Loss increased.')
             count += 1
         
         if patience == count:
+            debug_logger.debug(f'Loss increased {patience} times. Decreasing learning rate.')
             count = 0
             best_loss = float('inf')
             optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)
@@ -395,7 +415,7 @@ def save_weights(folder_path):
         np.savetxt(os.path.join(folder_path, 'learning_rate.txt'), np.array([optimizer.learning_rate]))
         np.savetxt(os.path.join(folder_path, 'loss.txt'), np.array([loss]))
     except Exception as e:
-        logging.error(f'An unexpected error occurred: {e}')
+        error_logger.error(f'An unexpected error occurred: {e}')
 
 
 
@@ -424,11 +444,11 @@ def create_folder_for_weights():
         try:
             os.makedirs(os.path.join(current_directory, string))
         except PermissionError:
-            logging.error(f'Permission denied: {os.path.join(current_directory, string)}')
+            error_logger.error(f'Permission denied: {os.path.join(current_directory, string)}')
         except OSError as e:
-            logging.error(f'OS error: {e}')
+            error_logger.error(f'OS error: {e}')
         except Exception as e:
-            logging.error(f'An unexpected error occurred: {e}')
+            error_logger.error(f'An unexpected error occurred: {e}')
 
     folder_path = os.path.join(weights_directory, folder_name)
 
@@ -436,11 +456,11 @@ def create_folder_for_weights():
         try:
             os.makedirs(folder_path)
         except PermissionError:
-            logging.error(f'Permission denied: {folder_path}')
+            error_logger.error(f'Permission denied: {folder_path}')
         except OSError as e:
-            logging.error(f'OS error: {e}')
+            error_logger.error(f'OS error: {e}')
         except Exception as e:
-            logging.error(f'An unexpected error occurred: {e}')
+            error_logger.error(f'An unexpected error occurred: {e}')
     
     return folder_path
 
@@ -462,7 +482,9 @@ def create_folder_for_weights():
 #
 def create_folder_for_logs():
     current_directory = os.getcwd()
-    folder_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    string = "Train_Neural_Network_"
+    string2 = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    folder_name = string + string2
 
     string = "Logs"
 
