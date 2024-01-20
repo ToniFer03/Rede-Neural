@@ -2,6 +2,7 @@ import random
 import numpy as np
 import classes
 import os
+import datetime
 
 # Neural network classes
 hidden_layer1 = None
@@ -10,13 +11,6 @@ hidden_layer3 = None
 linear_activation = None
 softmax_activation = None
 
-weights_layer1_file = 'weights_layer1.txt'
-biases_layer1_file = 'biases_layer1.txt'
-weights_layer2_file = 'weights_layer2.txt'
-biases_layer2_file = 'biases_layer2.txt'
-weights_layer3_file = 'weights_layer3.txt'
-biases_layer3_file = 'biases_layer3.txt'
-
 weights_layer1 = []
 biases_layer1 = []
 weights_layer2 = []
@@ -24,29 +18,9 @@ biases_layer2 = []
 weights_layer3 = []
 biases_layer3 = []
 
-with open(weights_layer1_file) as f:
-    for line in f:
-        weights_layer1.append([float(x) for x in line.split()])
-
-with open(biases_layer1_file) as f:
-    for line in f:
-        biases_layer1.append([float(x) for x in line.split()])
-
-with open(weights_layer2_file) as f:
-    for line in f:
-        weights_layer2.append([float(x) for x in line.split()])
-
-with open(biases_layer2_file) as f:
-    for line in f:
-        biases_layer2.append([float(x) for x in line.split()])
-
-with open(weights_layer3_file) as f:
-    for line in f:
-        weights_layer3.append([float(x) for x in line.split()])
-
-with open(biases_layer3_file) as f:
-    for line in f:
-        biases_layer3.append([float(x) for x in line.split()])
+# Game variables
+number_of_hidden_layers = 0
+size_hidden_layers = 0
 
 
 guardar_inputs = []
@@ -481,6 +455,7 @@ def count_simbolos(lista, simbolo):
             count += 1
     return count
 
+
 # Função para dar update no input data (FALTA NUMERO DE CADA SIMBOLO NA FILA)
 def update_input_data():
     global tabuleiro
@@ -547,9 +522,8 @@ def simulate_game():
         softmax_activation.forward(hidden_layer3.output)
 
         # Get action from output layer probabilities
-        sorted_actions = sorted(range(len(softmax_activation.output)), key=lambda k: softmax_activation.output[k], reverse=True)
-
-
+        flattened_output = softmax_activation.output.flatten()
+        sorted_actions = sorted(range(len(flattened_output)), key=lambda k: flattened_output[k], reverse=True)
 
         i = 0
         for action in sorted_actions:
@@ -559,6 +533,8 @@ def simulate_game():
                 guardar_melhor_move.append(action)
                 break
             i += 1
+
+        exibir_tabuleiro()
 
         if i == 25:
             # Game over
@@ -583,7 +559,6 @@ def simulate_game():
     return (score - 2**cont)
 
 
-
 def initialize_objects():
     global hidden_layer1
     global hidden_layer2
@@ -591,13 +566,12 @@ def initialize_objects():
     global linear_activation
     global softmax_activation
 
-    hidden_layer1 = classes.layer_dense(weights_layer1, biases_layer1) 
-    hidden_layer2 = classes.layer_dense(weights_layer2, biases_layer2) 
-    hidden_layer3 = classes.layer_dense(weights_layer3, biases_layer3)
+    hidden_layer1 = classes.layer_dense(None, None, weights_layer1, biases_layer1) 
+    hidden_layer2 = classes.layer_dense(None, None, weights_layer2, biases_layer2) 
+    hidden_layer3 = classes.layer_dense(None, None, weights_layer3, biases_layer3)
 
     linear_activation = classes.Activation_ReLU()   
     softmax_activation = classes.Activation_Softmax()
-
 
 
 # Função para exibir o tabuleiro
@@ -610,7 +584,15 @@ def exibir_tabuleiro():
         print("-" * 9)
 
 
+
 def load_weights():
+    global weights_layer1
+    global biases_layer1
+    global weights_layer2
+    global biases_layer2
+    global weights_layer3
+    global biases_layer3
+
     string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
     folder_path = os.path.join(os.getcwd(), string)
 
@@ -631,9 +613,33 @@ def load_weights():
 
         weights_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'))
         biases_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'))
-        biases_layer3 = biases_layer3.reshape(1, number_of_outputs)
+        biases_layer3 = biases_layer3.reshape(1, 25)
 
-        learning_rate = np.loadtxt(os.path.join(folder_path, 'learning_rate.txt'))
+
+
+def get_most_recent_folder(folder_path):
+    folders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
+
+    if not folders:
+        return None
+
+    folders_dates = [datetime.datetime.strptime(f, "%Y-%m-%d_%H-%M-%S") for f in folders]
+
+    most_recent_folder = max(folders_dates)
+
+    most_recent_folder_name = most_recent_folder.strftime("%Y-%m-%d_%H-%M-%S")
+
+    return most_recent_folder_name
+
+
+
+def ask_for_config():
+    global number_of_hidden_layers
+    global size_hidden_layers
+
+    number_of_hidden_layers = int(input('Number of hidden layers: ')).__int__()
+    size_hidden_layers = int(input('Size of hidden layers: ')).__int__()
+
 
 
 def main():
@@ -642,16 +648,15 @@ def main():
     global guardar_inputs
     global guardar_melhor_move
 
-    total_score = 0
-    for i in range(11):
-        tabuleiro = [[" " for _ in range(5)] for _ in range(5)]
-        initialize_objects()
-        gerar_fila_simbolos()
-        score = simulate_game()
-        total_score += score
-    
-    print("Score medio: ", total_score / 10)
 
+    ask_for_config()
+    load_weights()
+    tabuleiro = [[" " for _ in range(5)] for _ in range(5)]
+    initialize_objects()
+    gerar_fila_simbolos()
+    score = simulate_game()
+
+    print("Score: ", score)
 
     return 0
 

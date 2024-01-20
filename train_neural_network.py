@@ -16,7 +16,6 @@ number_of_hidden_layers = None
 learning_rate = None
 number_of_epochs = None
 loss = None
-best_loss = float('inf')
 rate_of_decrease = None
 
 # Weights and biases variables
@@ -333,9 +332,11 @@ def train_data():
     global activation1
     global loss_activation
     global optimizer
-    global loss
-    global best_loss
     global rate_of_decrease
+    global debug_logger
+
+    best_loss = float('inf')
+    number_increases = 1
 
     for epoch in range(number_of_epochs):
         # Forward pass
@@ -374,13 +375,26 @@ def train_data():
 
         debug_logger.debug(f'Epoch: {epoch} - Loss: {loss} - Learning rate: {optimizer.learning_rate}')
 
-        if epoch % 250 == 0:
-            if loss < best_loss:
-                best_loss = loss
-            else:
-                debug_logger.debug(f'Loss increased. Decreasing learning rate.')
-                best_loss = float('inf')
-                optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)
+        if loss < best_loss:
+            best_loss = loss
+            best_weights_layer1 = hidden_layer1.weights
+            best_biases_layer1 = hidden_layer1.biases
+            best_weights_layer2 = hidden_layer2.weights
+            best_biases_layer2 = hidden_layer2.biases
+            best_weights_layer3 = hidden_layer3.weights
+            best_biases_layer3 = hidden_layer3.biases
+        
+        if (epoch + 1) % (number_increases * 50000) == 0:
+            optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)	
+            number_increases += 1	        	
+            hidden_layer1.weights = best_weights_layer1
+            hidden_layer1.biases = best_biases_layer1
+            hidden_layer2.weights = best_weights_layer2
+            hidden_layer2.biases = best_biases_layer2
+            hidden_layer3.weights = best_weights_layer3
+            hidden_layer3.biases = best_biases_layer3
+            best_loss = float('inf')
+
     
     debug_logger.debug(f'Maximum number of epochs reached. Epoch: {epoch}')
             
