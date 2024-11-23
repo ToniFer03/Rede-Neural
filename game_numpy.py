@@ -28,9 +28,9 @@ guardar_melhor_move = []
 
 
 # Variables
-lista_simbolos = []
-simbolos_disponiveis = ['X', 'O', '+', '-']
-valor_simbolos = {'X': 1, 'O': 2, '+': 3, '-': 4}
+lista_figuras = []
+figuras_disponiveis = ['X', 'O', '+', '-']
+valor_figuras = {'X': 1, 'O': 2, '+': 3, '-': 4}
 tabuleiro = []
 
 
@@ -142,7 +142,7 @@ def verifica_existencia_micro_x(tabuleiro_temp):
     for lista_posicao in temp_posicao:
         num_correspondecias = 0
         for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[0]:
+            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[0]:
                 num_correspondecias += 1
             else:
                 break
@@ -160,7 +160,7 @@ def verifica_existencia_micro_cruz(tabuleiro_temp):
     for lista_posicao in temp_posicao:
         num_correspondecias = 0
         for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[2]:
+            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[2]:
                 num_correspondecias += 1
             else:
                 break
@@ -178,7 +178,7 @@ def verifica_existencia_micro_bola(tabuleiro_temp):
     for lista_posicao in temp_posicao:
         num_correspondecias = 0
         for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[1]:
+            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[1]:
                 num_correspondecias += 1
             else:
                 break
@@ -196,7 +196,7 @@ def verifica_existencia_micro_traco(tabuleiro_temp):
     for lista_posicao in temp_posicao:
         num_correspondecias = 0
         for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[3]:
+            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[3]:
                 num_correspondecias += 1
             else:
                 break
@@ -214,7 +214,7 @@ def verifica_existencia_macro_x(tabuleiro_temp):
     for lista_posicao in temp_posicao:
         num_correspondecias = 0
         for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[0]:
+            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[0]:
                 num_correspondecias += 1
             else:
                 break
@@ -232,7 +232,7 @@ def verifica_existencia_macro_cruz(tabuleiro_temp):
     for lista_posicao in temp_posicao:
         num_correspondecias = 0
         for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[2]:
+            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[2]:
                 num_correspondecias += 1
             else:
                 break
@@ -250,7 +250,7 @@ def verifica_existencia_macro_bola(tabuleiro_temp):
     for lista_posicao in temp_posicao:
         num_correspondecias = 0
         for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[1]:
+            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[1]:
                 num_correspondecias += 1
             else:
                 break
@@ -268,7 +268,7 @@ def verifica_existencia_macro_traco(tabuleiro_temp):
     for lista_posicao in temp_posicao:
         num_correspondecias = 0
         for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[3]:
+            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[3]:
                 num_correspondecias += 1
             else:
                 break
@@ -285,12 +285,12 @@ def verificar_microfiguras(figura, tabuleiro_temp):
     num_correspondecias = 0
 
     # X
-    if figura == simbolos_disponiveis[0]:
+    if figura == figuras_disponiveis[0]:
         if verifica_existencia_micro_x(tabuleiro_temp):
             temp_todas_posicoes = posicoes_x[1:]
             for lista_posicoes in temp_todas_posicoes:
                 for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[0]:
+                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[0]:
                         temp_posicao.append(posicao)
                         num_correspondecias += 1
                     else:
@@ -305,12 +305,12 @@ def verificar_microfiguras(figura, tabuleiro_temp):
 
 
     # Cruz
-    elif figura == simbolos_disponiveis[2]:
+    elif figura == figuras_disponiveis[2]:
         if verifica_existencia_micro_cruz(tabuleiro_temp):
             temp_todas_posicoes = posicoes_cruz[1:]
             for lista_posicoes in temp_todas_posicoes:
                 for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[2]:
+                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[2]:
                         temp_posicao.append(posicao)
                         num_correspondecias += 1
                     else:
@@ -325,12 +325,12 @@ def verificar_microfiguras(figura, tabuleiro_temp):
 
 
     # Bola
-    elif figura == simbolos_disponiveis[1]:
+    elif figura == figuras_disponiveis[1]:
         if verifica_existencia_micro_bola(tabuleiro_temp):
             temp_todas_posicoes = posicoes_bola[9:]
             for lista_posicoes in temp_todas_posicoes:
                 for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[1]:
+                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[1]:
                         temp_posicao.append(posicao)
                         num_correspondecias += 1
                     else:
@@ -345,12 +345,12 @@ def verificar_microfiguras(figura, tabuleiro_temp):
 
     
 
-    elif figura == simbolos_disponiveis[3]:
+    elif figura == figuras_disponiveis[3]:
         if verifica_existencia_micro_traco(tabuleiro_temp):
             temp_todas_posicoes = posicoes_traco[15:]
             for lista_posicoes in temp_todas_posicoes:
                 for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[3]:
+                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[3]:
                         temp_posicao.append(posicao)
                         num_correspondecias += 1
                     else:
@@ -376,7 +376,7 @@ def verificar_macrofiguras(figura, tabuleiro_temp):
     num_correspondecias = 0
 
     # X
-    if figura == simbolos_disponiveis[0]: 
+    if figura == figuras_disponiveis[0]: 
         if verifica_existencia_macro_x(tabuleiro_temp):
             lista_posicoes = posicoes_x[0]
             for posicao in lista_posicoes:
@@ -385,7 +385,7 @@ def verificar_macrofiguras(figura, tabuleiro_temp):
 
 
     # Cruz
-    elif figura == simbolos_disponiveis[2]:
+    elif figura == figuras_disponiveis[2]:
         if verifica_existencia_macro_cruz(tabuleiro_temp):
             lista_posicoes = posicoes_cruz[0]
             for posicao in lista_posicoes:
@@ -394,12 +394,12 @@ def verificar_macrofiguras(figura, tabuleiro_temp):
 
 
     # Bola
-    elif figura == simbolos_disponiveis[1]:
+    elif figura == figuras_disponiveis[1]:
         if verifica_existencia_macro_bola(tabuleiro_temp):
             temp_todas_posicoes = posicoes_bola[:9]
             for lista_posicoes in temp_todas_posicoes:
                 for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[1]:
+                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[1]:
                         temp_posicao.append(posicao)
                         num_correspondecias += 1
                     else:
@@ -414,12 +414,12 @@ def verificar_macrofiguras(figura, tabuleiro_temp):
 
 
     # Traco
-    elif figura == simbolos_disponiveis[3]:
+    elif figura == figuras_disponiveis[3]:
         if verifica_existencia_macro_traco(tabuleiro_temp):
             temp_todas_posicoes = posicoes_traco[:15]
             for lista_posicoes in temp_todas_posicoes:
                 for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == simbolos_disponiveis[3]:
+                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[3]:
                         temp_posicao.append(posicao)
                         num_correspondecias += 1
                     else:
@@ -440,12 +440,12 @@ def verificar_macrofiguras(figura, tabuleiro_temp):
 
 # Gerar fila random de simbolos
 def gerar_fila_simbolos():
-    global lista_simbolos
-    global simbolos_disponiveis
+    global lista_figuras
+    global figuras_disponiveis
 
     num_iterations = random.randrange(10, 40)
     for i in range(num_iterations):
-        lista_simbolos.append(simbolos_disponiveis[random.randint(0, 3)])
+        lista_figuras.append(figuras_disponiveis[random.randint(0, 3)])
 
 
 def count_simbolos(lista, simbolo):
@@ -459,8 +459,8 @@ def count_simbolos(lista, simbolo):
 # Função para dar update no input data (FALTA NUMERO DE CADA SIMBOLO NA FILA)
 def update_input_data():
     global tabuleiro
-    global lista_simbolos
-    global valor_simbolos
+    global lista_figuras
+    global valor_figuras
 
     input_data = []
 
@@ -470,20 +470,20 @@ def update_input_data():
             if tabuleiro[i][j] == " ":
                 input_data.append(0)
             else:
-                input_data.append(valor_simbolos[tabuleiro[i][j]])
+                input_data.append(valor_figuras[tabuleiro[i][j]])
 
     # Update os 12 valores seguintes com os simbolos da lista
     for i in range(12):
-        if i < len(lista_simbolos):
-            input_data.append(valor_simbolos[lista_simbolos[i]])
+        if i < len(lista_figuras):
+            input_data.append(valor_figuras[lista_figuras[i]])
         else:
             input_data.append(0)
     
-    input_data.append(count_simbolos(lista_simbolos, simbolos_disponiveis[0]))
-    input_data.append(count_simbolos(lista_simbolos, simbolos_disponiveis[1]))
-    input_data.append(count_simbolos(lista_simbolos, simbolos_disponiveis[2]))
-    input_data.append(count_simbolos(lista_simbolos, simbolos_disponiveis[3]))
-    input_data.append(len(lista_simbolos))
+    input_data.append(count_simbolos(lista_figuras, figuras_disponiveis[0]))
+    input_data.append(count_simbolos(lista_figuras, figuras_disponiveis[1]))
+    input_data.append(count_simbolos(lista_figuras, figuras_disponiveis[2]))
+    input_data.append(count_simbolos(lista_figuras, figuras_disponiveis[3]))
+    input_data.append(len(lista_figuras))
 
     return input_data
 
@@ -500,7 +500,7 @@ def simulate_game():
     # Replace this with your actual game logic to simulate the game and obtain the action (reward)
     # Choose an action based on the output layer probabilities
     global tabuleiro
-    global lista_simbolos
+    global lista_figuras
     global hidden_layer1
     global hidden_layer2
     global hidden_layer3
@@ -511,7 +511,7 @@ def simulate_game():
 
     score = 0
     input_data = [0]
-    while len(lista_simbolos) > 0:
+    while len(lista_figuras) > 0:
         # Update input data based on the current game state
         input_data[0] = update_input_data()
         hidden_layer1.forward(input_data)
@@ -529,7 +529,7 @@ def simulate_game():
         for action in sorted_actions:
             row, col = index_to_2d(action, 5)
             if tabuleiro[row][col] == " ":
-                tabuleiro[row][col] = lista_simbolos[0]
+                tabuleiro[row][col] = lista_figuras[0]
                 guardar_melhor_move.append(action)
                 break
             i += 1
@@ -542,11 +542,11 @@ def simulate_game():
 
 
         # Verificar simbolo, update no score e retirar simbolo da lista
-        score += verificar_macrofiguras(lista_simbolos[0], tabuleiro)
-        score += verificar_microfiguras(lista_simbolos[0], tabuleiro)
+        score += verificar_macrofiguras(lista_figuras[0], tabuleiro)
+        score += verificar_microfiguras(lista_figuras[0], tabuleiro)
         guardar_inputs.append(input_data[0])
         
-        lista_simbolos.pop(0)
+        lista_figuras.pop(0)
 
     # Numero de peças no tabuleiro
     cont = 0
@@ -644,7 +644,7 @@ def ask_for_config():
 
 def main():
     global tabuleiro
-    global lista_simbolos
+    global lista_figuras
     global guardar_inputs
     global guardar_melhor_move
 

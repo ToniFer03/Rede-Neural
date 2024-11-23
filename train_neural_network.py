@@ -349,7 +349,7 @@ def train_data():
         hidden_layer3.forward(activation1.output)
         loss = loss_activation.forward(hidden_layer3.output, training_targets)
 
-        if epoch % 1000 == 0:
+        if epoch % 10000 == 0:
             print(f'loss: {loss}')
             print(f'learning_rate: {optimizer.learning_rate}')
             print(f'epoch: {epoch}')
@@ -373,7 +373,10 @@ def train_data():
         optimizer.update_params(hidden_layer2)
         optimizer.update_params(hidden_layer3)
 
-        debug_logger.debug(f'Epoch: {epoch} - Loss: {loss} - Learning rate: {optimizer.learning_rate}')
+        if epoch % 10000 == 0:
+            debug_logger.debug(f'Epoch: {epoch} - Loss: {loss} - Learning rate: {optimizer.learning_rate}')
+
+
 
         if loss < best_loss:
             best_loss = loss
@@ -549,4 +552,3 @@ def main():
 
 
 main()
-
