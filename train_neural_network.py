@@ -299,9 +299,9 @@ def initialize_objects():
     global loss_activation
     global optimizer
 
-    hidden_layer1 = classes.layer_dense(number_of_inputs, size_hidden_layers, weights_layer1, biases_layer1) 
-    hidden_layer2 = classes.layer_dense(size_hidden_layers, size_hidden_layers, weights_layer2, biases_layer2) 
-    hidden_layer3 = classes.layer_dense(size_hidden_layers, number_of_outputs, weights_layer3, biases_layer3)
+    hidden_layer1 = classes.Layer_Dense(number_of_inputs, size_hidden_layers, weights_layer1, biases_layer1) 
+    hidden_layer2 = classes.Layer_Dense(size_hidden_layers, size_hidden_layers, weights_layer2, biases_layer2) 
+    hidden_layer3 = classes.Layer_Dense(size_hidden_layers, number_of_outputs, weights_layer3, biases_layer3)
 
     activation1 = classes.Activation_ReLU()
     loss_activation = classes.Activation_Softmax_Loss_CategoricalCrossentropy()

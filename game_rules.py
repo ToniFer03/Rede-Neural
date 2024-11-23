@@ -1,10 +1,10 @@
 # game_rules.py
 
 # Variables
-figuras_disponiveis = ['X', 'O', '+', '-']
+available_figures = ['X', 'O', '+', '-']
 
 # All possible coordinates to form an X in a 5x5 board
-posicoes_x = [
+positions_x = [
     [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (0, 4), (1, 3), (3, 1), (4, 0)],
     [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
     [(0, 1), (0, 3), (1, 2), (2, 1), (2, 3)],
@@ -19,7 +19,7 @@ posicoes_x = [
 
 
 # All possible coordinates to form a Cross in a 5x5 board
-posicoes_cruz = [
+positions_cross = [
     [(0, 2), (1, 2), (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (3, 2), (4, 2)],
     [(0, 1), (1, 0), (1, 1), (1, 2), (2, 1)],
     [(0, 2), (1, 1), (1, 2), (1, 3), (2, 2)],
@@ -34,7 +34,7 @@ posicoes_cruz = [
 
 
 # All possible coordinates to form a circle in a 5x5 board
-posicoes_bola = [
+positions_circle = [
     [(0, 0), (0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1), (2, 2)],
     [(0, 1), (0, 2), (0, 3), (1, 1), (1, 3), (2, 1), (2, 2), (2, 3)],
     [(0, 2), (0, 3), (0, 4), (1, 2), (1, 4), (2, 2), (2, 3), (2, 4)],
@@ -64,7 +64,7 @@ posicoes_bola = [
 
 
 # All possible coordinates to form a dash in a 5x5 board
-posicoes_traco = [
+positions_dash = [
     [(0, 0), (1, 0), (2, 0)],
     [(1, 0), (2, 0), (3, 0)],
     [(2, 0), (3, 0), (4, 0)],
@@ -102,13 +102,13 @@ posicoes_traco = [
     [(3, 4), (4, 4)],
 ]
 
-def verifica_existencia_micro_x(tabuleiro_temp):
+def verify_five_figure_x(board):
     """
         Verifies if there is an X formed by 5 pieces
 
         Parameters
         ----------
-        tabuleiro_temp
+        board
             Object that contains a copy of the current state of the board
 
         Returns
@@ -117,29 +117,29 @@ def verifica_existencia_micro_x(tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = posicoes_x[1:]
+    temp_position = positions_x[1:]
 
-    for lista_posicao in temp_posicao:
-        num_correspondecias = 0
-        for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[0]:
-                num_correspondecias += 1
+    for position_list in temp_position:
+        num_correspondances = 0
+        for position in position_list:
+            if board[position[0]][position[1]] == available_figures[0]:
+                num_correspondances += 1
             else:
                 break
         
-            if num_correspondecias == 5:
+            if num_correspondances == 5:
                 return True
 
     return False
 
 
-def verifica_existencia_micro_cruz(tabuleiro_temp):
+def verify_five_figure_cross(board):
     """
         Verifies if there is a Cross formed by 5 pieces
 
         Parameters
         ----------
-        tabuleiro_temp
+        board
             Object that contains a copy of the current state of the board
 
         Returns
@@ -148,29 +148,29 @@ def verifica_existencia_micro_cruz(tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = posicoes_cruz[1:]
+    temp_position = positions_cross[1:]
 
-    for lista_posicao in temp_posicao:
-        num_correspondecias = 0
-        for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[2]:
-                num_correspondecias += 1
+    for position_list in temp_position:
+        num_correspondances = 0
+        for position in position_list:
+            if board[position[0]][position[1]] == available_figures[2]:
+                num_correspondances += 1
             else:
                 break
         
-            if num_correspondecias == 5:
+            if num_correspondances == 5:
                 return True
 
     return False
 
 
-def verifica_existencia_micro_bola(tabuleiro_temp):
+def verify_four_figure_circle(board):
     """
         Verifies if there is a circle formed by 4 pieces
 
         Parameters
         ----------
-        tabuleiro_temp
+        board
             Object that contains a copy of the current state of the board
 
         Returns
@@ -179,29 +179,29 @@ def verifica_existencia_micro_bola(tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = posicoes_bola[9:]
+    temp_position = positions_circle[9:]
 
-    for lista_posicao in temp_posicao:
-        num_correspondecias = 0
-        for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[1]:
-                num_correspondecias += 1
+    for position_list in temp_position:
+        num_correspondances = 0
+        for position in position_list:
+            if board[position[0]][position[1]] == available_figures[1]:
+                num_correspondances += 1
             else:
                 break
         
-            if num_correspondecias == 4:
+            if num_correspondances == 4:
                 return True
 
     return False
 
 
-def verifica_existencia_micro_traco(tabuleiro_temp):
+def verify_two_figure_dash(board):
     """
         Verifies if there is a Dash formed by 2 pieces
 
         Parameters
         ----------
-        tabuleiro_temp
+        board
             Object that contains a copy of the current state of the board
 
         Returns
@@ -210,29 +210,29 @@ def verifica_existencia_micro_traco(tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = posicoes_traco[15:]
+    temp_position = positions_dash[15:]
 
-    for lista_posicao in temp_posicao:
-        num_correspondecias = 0
-        for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[3]:
-                num_correspondecias += 1
+    for position_list in temp_position:
+        num_correspondances = 0
+        for position in position_list:
+            if board[position[0]][position[1]] == available_figures[3]:
+                num_correspondances += 1
             else:
                 break
         
-            if num_correspondecias == 2:
+            if num_correspondances == 2:
                 return True
 
     return False
 
 
-def verifica_existencia_macro_x(tabuleiro_temp):
+def verify_nine_figure_x(board):
     """
         Verifies if there is an X formed by 9 pieces
 
         Parameters
         ----------
-        tabuleiro_temp
+        board
             Object that contains a copy of the current state of the board
 
         Returns
@@ -241,30 +241,30 @@ def verifica_existencia_macro_x(tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = posicoes_x[:1]
+    temp_position = positions_x[:1]
 
-    for lista_posicao in temp_posicao:
-        num_correspondecias = 0
-        for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[0]:
-                num_correspondecias += 1
+    for position_list in temp_position:
+        num_correspondances = 0
+        for position in position_list:
+            if board[position[0]][position[1]] == available_figures[0]:
+                num_correspondances += 1
             else:
                 break
         
-            if num_correspondecias == 9:
+            if num_correspondances == 9:
                 return True
 
     return False
 
 
 
-def verifica_existencia_macro_cruz(tabuleiro_temp):
+def verify_nine_figure_cross(board):
     """
         Verifies if there is a Cross formed by 9 pieces
 
         Parameters
         ----------
-        tabuleiro_temp
+        board
             Object that contains a copy of the current state of the board
 
         Returns
@@ -273,29 +273,29 @@ def verifica_existencia_macro_cruz(tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = posicoes_cruz[:1]
+    temp_position = positions_cross[:1]
 
-    for lista_posicao in temp_posicao:
-        num_correspondecias = 0
-        for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[2]:
-                num_correspondecias += 1
+    for position_list in temp_position:
+        num_correspondances = 0
+        for position in position_list:
+            if board[position[0]][position[1]] == available_figures[2]:
+                num_correspondances += 1
             else:
                 break
         
-            if num_correspondecias == 9:
+            if num_correspondances == 9:
                 return True
 
     return False
 
 
-def verifica_existencia_macro_bola(tabuleiro_temp):
+def verify_eight_figure_circle(board):
     """
         Verifies if there is a Circle formed by 8 pieces
 
         Parameters
         ----------
-        tabuleiro_temp
+        board
             Object that contains a copy of the current state of the board
 
         Returns
@@ -304,30 +304,30 @@ def verifica_existencia_macro_bola(tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = posicoes_bola[:9]
+    temp_position = positions_circle[:9]
 
-    for lista_posicao in temp_posicao:
-        num_correspondecias = 0
-        for posicao in lista_posicao:
-            print(tabuleiro_temp[posicao[0]][posicao[1]])
-            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[1]:
-                num_correspondecias += 1
+    for position_list in temp_position:
+        num_correspondances = 0
+        for position in position_list:
+            print(board[position[0]][position[1]])
+            if board[position[0]][position[1]] == available_figures[1]:
+                num_correspondances += 1
             else:
                 break
         
-            if num_correspondecias == 8:
+            if num_correspondances == 8:
                 return True
 
     return False
 
 
-def verifica_existencia_macro_traco(tabuleiro_temp):
+def verify_three_figure_dash(board):
     """
         Verifies if there is a Dash formed by 3 pieces
 
         Parameters
         ----------
-        tabuleiro_temp
+        board
             Object that contains a copy of the current state of the board
 
         Returns
@@ -336,23 +336,23 @@ def verifica_existencia_macro_traco(tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = posicoes_traco[:15]
+    temp_position = positions_dash[:15]
 
-    for lista_posicao in temp_posicao:
-        num_correspondecias = 0
-        for posicao in lista_posicao:
-            if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[3]:
-                num_correspondecias += 1
+    for position_list in temp_position:
+        num_correspondances = 0
+        for position in position_list:
+            if board[position[0]][position[1]] == available_figures[3]:
+                num_correspondances += 1
             else:
                 break
         
-            if num_correspondecias == 3:
+            if num_correspondances == 3:
                 return True
 
     return False
 
 
-def verificar_microformas(figura, tabuleiro_temp):
+def verify_small_forms(figure, board):
     """
         Funtion responsible for calling the funtion to verify if the smaller form of the
         last figure played has been completed.
@@ -361,9 +361,9 @@ def verificar_microformas(figura, tabuleiro_temp):
 
         Parameters
         ----------
-        figura
+        figure
             String corresponding to the last figure that was played
-        tabuleiro_temp
+        board
             Object that contains the current state of the board
 
         Returns
@@ -371,97 +371,97 @@ def verificar_microformas(figura, tabuleiro_temp):
         boolean
             Returns the score that that play originated to be added to the total score
     """
-    temp_posicao = []
+    temp_position = []
     temp_score = 0
-    num_correspondecias = 0
+    num_correspondances = 0
 
     # X
-    if figura == figuras_disponiveis[0]:
-        if verifica_existencia_micro_x(tabuleiro_temp):
-            temp_todas_posicoes = posicoes_x[1:]
-            for lista_posicoes in temp_todas_posicoes:
-                for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[0]:
-                        temp_posicao.append(posicao)
-                        num_correspondecias += 1
+    if figure == available_figures[0]:
+        if verify_five_figure_x(board):
+            temp_all_positions = positions_x[1:]
+            for positions_list in temp_all_positions:
+                for position in positions_list:
+                    if board[position[0]][position[1]] == available_figures[0]:
+                        temp_position.append(position)
+                        num_correspondances += 1
                     else:
-                        num_correspondecias = 0
-                        temp_posicao = []
+                        num_correspondances = 0
+                        temp_position = []
                         break
                     
-                if(num_correspondecias == 5):
+                if(num_correspondances == 5):
                     break           
 
             temp_score = 32
 
 
     # Cross
-    elif figura == figuras_disponiveis[2]:
-        if verifica_existencia_micro_cruz(tabuleiro_temp):
-            temp_todas_posicoes = posicoes_cruz[1:]
-            for lista_posicoes in temp_todas_posicoes:
-                for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[2]:
-                        temp_posicao.append(posicao)
-                        num_correspondecias += 1
+    elif figure == available_figures[2]:
+        if verify_five_figure_cross(board):
+            temp_all_positions = positions_cross[1:]
+            for positions_list in temp_all_positions:
+                for position in positions_list:
+                    if board[position[0]][position[1]] == available_figures[2]:
+                        temp_position.append(position)
+                        num_correspondances += 1
                     else:
-                        num_correspondecias = 0
-                        temp_posicao = []
+                        num_correspondances = 0
+                        temp_position = []
                         break
                     
-                if(num_correspondecias == 5):
+                if(num_correspondances == 5):
                     break
             
             temp_score = 32
 
 
     # Circle
-    elif figura == figuras_disponiveis[1]:
-        if verifica_existencia_micro_bola(tabuleiro_temp):
-            temp_todas_posicoes = posicoes_bola[9:]
-            for lista_posicoes in temp_todas_posicoes:
-                for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[1]:
-                        temp_posicao.append(posicao)
-                        num_correspondecias += 1
+    elif figure == available_figures[1]:
+        if verify_four_figure_circle(board):
+            temp_all_positions = positions_circle[9:]
+            for positions_list in temp_all_positions:
+                for position in positions_list:
+                    if board[position[0]][position[1]] == available_figures[1]:
+                        temp_position.append(position)
+                        num_correspondances += 1
                     else:
-                        num_correspondecias = 0
-                        temp_posicao = []
+                        num_correspondances = 0
+                        temp_position = []
                         break
                     
-                if(num_correspondecias == 4):
+                if(num_correspondances == 4):
                     break
             
             temp_score = 16  
 
     
     # Dash
-    elif figura == figuras_disponiveis[3]:
-        if verifica_existencia_micro_traco(tabuleiro_temp):
-            temp_todas_posicoes = posicoes_traco[15:]
-            for lista_posicoes in temp_todas_posicoes:
-                for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[3]:
-                        temp_posicao.append(posicao)
-                        num_correspondecias += 1
+    elif figure == available_figures[3]:
+        if verify_two_figure_dash(board):
+            temp_all_positions = positions_dash[15:]
+            for positions_list in temp_all_positions:
+                for position in positions_list:
+                    if board[position[0]][position[1]] == available_figures[3]:
+                        temp_position.append(position)
+                        num_correspondances += 1
                     else:
-                        num_correspondecias = 0
-                        temp_posicao = []
+                        num_correspondances = 0
+                        temp_position = []
                         break
                     
-                if(num_correspondecias == 2):
+                if(num_correspondances == 2):
                     break
             
             temp_score = 2
         
-    for posicao in temp_posicao:
-        tabuleiro_temp[posicao[0]][posicao[1]] = " "
+    for position in temp_position:
+        board[position[0]][position[1]] = " "
 
     return temp_score
 
 
 
-def verificar_macroformas(figura, tabuleiro_temp):
+def verify_big_forms(figure, board):
     """
         Funtion responsible for calling the funtion to verify if the biggest form of the
         last figure played has been completed.
@@ -470,9 +470,9 @@ def verificar_macroformas(figura, tabuleiro_temp):
 
         Parameters
         ----------
-        figura
+        figure
             String corresponding to the last figure that was played
-        tabuleiro_temp
+        board
             Object that contains the current state of the board
 
         Returns
@@ -481,67 +481,67 @@ def verificar_macroformas(figura, tabuleiro_temp):
             Returns a boolean indicating if a certain figure was formed or not
 
     """
-    temp_posicao = []
+    temp_position = []
     temp_score = 0
-    num_correspondecias = 0
+    num_correspondances = 0
 
     # X
-    if figura == figuras_disponiveis[0]: 
-        if verifica_existencia_macro_x(tabuleiro_temp):
-            lista_posicoes = posicoes_x[0]
-            for posicao in lista_posicoes:
-                temp_posicao.append(posicao)
+    if figure == available_figures[0]: 
+        if verify_nine_figure_x(board):
+            positions_list = positions_x[0]
+            for position in positions_list:
+                temp_position.append(position)
             temp_score = 512
 
 
     # Cross
-    elif figura == figuras_disponiveis[2]:
-        if verifica_existencia_macro_cruz(tabuleiro_temp):
-            lista_posicoes = posicoes_cruz[0]
-            for posicao in lista_posicoes:
-                temp_posicao.append(posicao)
+    elif figure == available_figures[2]:
+        if verify_nine_figure_cross(board):
+            positions_list = positions_cross[0]
+            for position in positions_list:
+                temp_position.append(position)
             temp_score = 512
 
 
     # Circle
-    elif figura == figuras_disponiveis[1]:
-        if verifica_existencia_macro_bola(tabuleiro_temp):
-            temp_todas_posicoes = posicoes_bola[:9]
-            for lista_posicoes in temp_todas_posicoes:
-                for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[1]:
-                        temp_posicao.append(posicao)
-                        num_correspondecias += 1
+    elif figure == available_figures[1]:
+        if verify_eight_figure_circle(board):
+            temp_all_positions = positions_circle[:9]
+            for positions_list in temp_all_positions:
+                for position in positions_list:
+                    if board[position[0]][position[1]] == available_figures[1]:
+                        temp_position.append(position)
+                        num_correspondances += 1
                     else:
-                        num_correspondecias = 0
-                        temp_posicao = []
+                        num_correspondances = 0
+                        temp_position = []
                         break
                 
-                if(num_correspondecias == 8):
+                if(num_correspondances == 8):
                     break
             
             temp_score = 256
 
 
     # Dash
-    elif figura == figuras_disponiveis[3]:
-        if verifica_existencia_macro_traco(tabuleiro_temp):
-            temp_todas_posicoes = posicoes_traco[:15]
-            for lista_posicoes in temp_todas_posicoes:
-                for posicao in lista_posicoes:
-                    if tabuleiro_temp[posicao[0]][posicao[1]] == figuras_disponiveis[3]:
-                        temp_posicao.append(posicao)
-                        num_correspondecias += 1
+    elif figure == available_figures[3]:
+        if verify_three_figure_dash(board):
+            temp_all_positions = positions_dash[:15]
+            for positions_list in temp_all_positions:
+                for position in positions_list:
+                    if board[position[0]][position[1]] == available_figures[3]:
+                        temp_position.append(position)
+                        num_correspondances += 1
                     else:
-                        num_correspondecias = 0
-                        temp_posicao = []
+                        num_correspondances = 0
+                        temp_position = []
                         break
                 
-                if(num_correspondecias == 3):
+                if(num_correspondances == 3):
                     break
             temp_score = 8
 
-    for posicao in temp_posicao:
-        tabuleiro_temp[posicao[0]][posicao[1]] = " "
+    for position in temp_position:
+        board[position[0]][position[1]] = " "
 
     return temp_score

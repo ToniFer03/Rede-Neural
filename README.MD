@@ -1,10 +1,11 @@
-﻿# pa-secure-chat-group-11
+﻿# Figuma Neural Network
 
 ## Table of Contents
 
 - [Commit Rules](#rules-to-follow-before-a-commit)
 - [Branches](#rules-for-branches)
 - [User Manual](#user-manual)
+- [Game Rules](#game-rules)
 
 ## Rules to follow before a commit
 
@@ -57,3 +58,5 @@ There can also exist temporary branches like:
 The branch names must be short and explain its purpose, can't contain special characters of white spaces;
 
 ## User Manual
+
+## Game Rules
