@@ -3,7 +3,7 @@ import numpy as np
 import classes
 import os
 import datetime
-from game_rules import verificar_macroformas, verificar_microformas
+from game_rules import verify_big_forms, verify_small_forms
 
 
 # Neural network classes
@@ -24,63 +24,63 @@ biases_layer3 = []
 number_of_hidden_layers = 0
 size_hidden_layers = 0
 
-guardar_inputs = []
-guardar_melhor_move = []
+store_inputs = []
+store_best_move = []
 
 # Variables
-lista_figuras = []
-figuras_disponiveis = ['X', 'O', '+', '-']
-valor_figuras = {'X': 1, 'O': 2, '+': 3, '-': 4}
-tabuleiro = []
+figures_list = []
+available_figures = ['X', 'O', '+', '-']
+figures_translation_value = {'X': 1, 'O': 2, '+': 3, '-': 4}
+board = []
 
 
 
 # Gerar fila random de simbolos
-def gerar_fila_simbolos():
-    global lista_figuras
-    global figuras_disponiveis
+def generate_figures_queue():
+    global figures_list
+    global available_figures
 
     num_iterations = random.randrange(10, 40)
     for i in range(num_iterations):
-        lista_figuras.append(figuras_disponiveis[random.randint(0, 3)])
+        figures_list.append(available_figures[random.randint(0, 3)])
 
 
-def count_simbolos(lista, simbolo):
+def count_simbolos(figures_list_copy, figure):
     count = 0
-    for i in lista:
-        if i == simbolo:
+    for i in figures_list_copy:
+        if i == figure:
             count += 1
     return count
 
 
 # Função para dar update no input data (FALTA NUMERO DE CADA SIMBOLO NA FILA)
 def update_input_data():
-    global tabuleiro
-    global lista_figuras
-    global valor_figuras
+    global board
+    global figures_list
+    global figures_translation_value
 
     input_data = []
 
-    # Update os primeiros 25 valores do input data com o tabuleiro
+    # Update os primeiros 25 valores do input data com o board
     for i in range(5):
         for j in range(5):
-            if tabuleiro[i][j] == " ":
+            if board[i][j] == " ":
                 input_data.append(0)
             else:
-                input_data.append(valor_figuras[tabuleiro[i][j]])
+                input_data.append(figures_translation_value[board[i][j]])
 
     # Update os 12 valores seguintes com os simbolos da lista
     for i in range(12):
-        if i < len(lista_figuras):
-            input_data.append(valor_figuras[lista_figuras[i]])
+        if i < len(figures_list):
+            input_data.append(figures_translation_value[figures_list[i]])
         else:
             input_data.append(0)
     
-    input_data.append(count_simbolos(lista_figuras, figuras_disponiveis[0]))
-    input_data.append(count_simbolos(lista_figuras, figuras_disponiveis[1]))
-    input_data.append(count_simbolos(lista_figuras, figuras_disponiveis[2]))
-    input_data.append(count_simbolos(lista_figuras, figuras_disponiveis[3]))
-    input_data.append(len(lista_figuras))
+    input_data.append(count_simbolos(figures_list, available_figures[0]))
+    input_data.append(count_simbolos(figures_list, available_figures[1]))
+    input_data.append(count_simbolos(figures_list, available_figures[2]))
+    input_data.append(count_simbolos(figures_list, available_figures[3]))
+    input_data.append(len(figures_list))
 
     return input_data
 
@@ -96,19 +96,19 @@ def index_to_2d(index, num_columns):
 def simulate_game():
     # Replace this with your actual game logic to simulate the game and obtain the action (reward)
     # Choose an action based on the output layer probabilities
-    global tabuleiro
-    global lista_figuras
+    global board
+    global figures_list
     global hidden_layer1
     global hidden_layer2
     global hidden_layer3
     global linear_activation
     global softmax_activation
-    global guardar_inputs
-    global guardar_melhor_move
+    global store_inputs
+    global store_best_move
 
     score = 0
     input_data = [0]
-    while len(lista_figuras) > 0:
+    while len(figures_list) > 0:
         # Update input data based on the current game state
         input_data[0] = update_input_data()
         hidden_layer1.forward(input_data)
@@ -125,13 +125,13 @@ def simulate_game():
         i = 0
         for action in sorted_actions:
             row, col = index_to_2d(action, 5)
-            if tabuleiro[row][col] == " ":
-                tabuleiro[row][col] = lista_figuras[0]
-                guardar_melhor_move.append(action)
+            if board[row][col] == " ":
+                board[row][col] = figures_list[0]
+                store_best_move.append(action)
                 break
             i += 1
 
-        exibir_tabuleiro()
+        show_board()
 
         if i == 25:
             # Game over
@@ -139,17 +139,17 @@ def simulate_game():
 
 
         # Verificar simbolo, update no score e retirar simbolo da lista
-        score += verificar_macroformas(lista_figuras[0], tabuleiro)
-        score += verificar_microformas(lista_figuras[0], tabuleiro)
-        guardar_inputs.append(input_data[0])
+        score += verify_big_forms(figures_list[0], board)
+        score += verify_small_forms(figures_list[0], board)
+        store_inputs.append(input_data[0])
         
-        lista_figuras.pop(0)
+        figures_list.pop(0)
 
-    # Numero de peças no tabuleiro
+    # Numero de peças no board
     cont = 0
     for i in range(5):
         for j in range(5):
-            if tabuleiro[i][j] != " ":
+            if board[i][j] != " ":
                 cont += 1
 
 
@@ -163,20 +163,20 @@ def initialize_objects():
     global linear_activation
     global softmax_activation
 
-    hidden_layer1 = classes.layer_dense(None, None, weights_layer1, biases_layer1) 
-    hidden_layer2 = classes.layer_dense(None, None, weights_layer2, biases_layer2) 
-    hidden_layer3 = classes.layer_dense(None, None, weights_layer3, biases_layer3)
+    hidden_layer1 = classes.Layer_Dense(None, None, weights_layer1, biases_layer1) 
+    hidden_layer2 = classes.Layer_Dense(None, None, weights_layer2, biases_layer2) 
+    hidden_layer3 = classes.Layer_Dense(None, None, weights_layer3, biases_layer3)
 
     linear_activation = classes.Activation_ReLU()   
     softmax_activation = classes.Activation_Softmax()
 
 
-# Função para exibir o tabuleiro
-def exibir_tabuleiro():
-    global tabuleiro
+# Função para exibir o board
+def show_board():
+    global board
 
     print("-" * 9)
-    for linha in tabuleiro:
+    for linha in board:
         print("|".join(celula for celula in linha))
         print("-" * 9)
 
@@ -240,21 +240,19 @@ def ask_for_config():
 
 
 def main():
-    global tabuleiro
-    global lista_figuras
-    global guardar_inputs
-    global guardar_melhor_move
+    global board
+    global figures_list
+    global store_inputs
+    global store_best_move
 
 
     ask_for_config()
     load_weights()
-    tabuleiro = [[" " for _ in range(5)] for _ in range(5)]
+    board = [[" " for _ in range(5)] for _ in range(5)]
     initialize_objects()
-    gerar_fila_simbolos()
+    generate_figures_queue()
     score = simulate_game()
 
     print("Score: ", score)
 
     return 0
-
-main()

@@ -1,6 +1,6 @@
 import numpy as np
 
-class layer_dense:
+class Layer_Dense:
     def __init__(self, n_inputs=None, n_neurons=None, custom_weights=None, custom_biases=None):
         if custom_weights is None:
             self.weights = 0.1 * np.random.randn(n_inputs, n_neurons)

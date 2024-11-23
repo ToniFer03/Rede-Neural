@@ -1,32 +1,34 @@
 import random
 import json
 import os
-from game_rules import verificar_macroformas, verificar_microformas
+from game_rules import verify_big_forms, verify_small_forms
 
 
 # Variables
-lista_figuras = []
-valor_figuras = {'X': 1, 'O': 2, '+': 3, '-': 4}
-tabuleiro = []
+figures_list = []
+figures_translation_value = {'X': 1, 'O': 2, '+': 3, '-': 4}
+available_figures = ['X', 'O', '+', '-']
+board = []
 data = []
+existing_data = []
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def gerar_fila_figuras():
+def generate_figures_queue():
     """
         Function responsible for generating a list of random predetermined symbols
     """
-    global lista_figuras
-    global figuras_disponiveis
+    global figures_list
+    global available_figures
 
     num_iterations = random.randrange(10, 40)
     for i in range(num_iterations):
-        lista_figuras.append(figuras_disponiveis[random.randint(0, 3)])
+        figures_list.append(available_figures[random.randint(0, 3)])
 
 
-def count_figuras(lista, simbolo):
+def count_figures(figures_list_copy, figure):
     """
         Funtion responsible for counting how many of a certain symbols are still
         left on list
@@ -45,8 +47,8 @@ def count_figuras(lista, simbolo):
 
     """
     count = 0
-    for i in lista:
-        if i == simbolo:
+    for i in figures_list_copy:
+        if i == figure:
             count += 1
     return count
 
@@ -63,31 +65,31 @@ def update_input_data():
         input_data
             Object containing the current state of the game to be stored
     """
-    global tabuleiro
-    global lista_figuras
-    global valor_figuras
+    global board
+    global figures_list
+    global figures_translation_value
 
     input_data = []
 
     for i in range(5):
         for j in range(5):
-            if tabuleiro[i][j] == " ":
+            if board[i][j] == " ":
                 input_data.append(0)
             else:
-                input_data.append(valor_figuras[tabuleiro[i][j]])
+                input_data.append(figures_translation_value[board[i][j]])
 
     for i in range(12):
-        if i < len(lista_figuras):
-            input_data.append(valor_figuras[lista_figuras[i]])
+        if i < len(figures_list):
+            input_data.append(figures_translation_value[figures_list[i]])
         else:
             input_data.append(0)
     
-    input_data.append(count_figuras(lista_figuras, figuras_disponiveis[0]))
-    input_data.append(count_figuras(lista_figuras, figuras_disponiveis[1]))
-    input_data.append(count_figuras(lista_figuras, figuras_disponiveis[2]))
-    input_data.append(count_figuras(lista_figuras, figuras_disponiveis[3]))
+    input_data.append(count_figures(figures_list, available_figures[0]))
+    input_data.append(count_figures(figures_list, available_figures[1]))
+    input_data.append(count_figures(figures_list, available_figures[2]))
+    input_data.append(count_figures(figures_list, available_figures[3]))
 
-    input_data.append(len(lista_figuras))
+    input_data.append(len(figures_list))
 
     return input_data
 
@@ -112,100 +114,210 @@ def simulate_game():
             the pieces left on the board
 
     """
-    global tabuleiro
-    global lista_figuras
+    global board
+    global figures_list
     global data
 
     score = 0
     input_data = [0]
-    while len(lista_figuras) > 0:
+    while len(figures_list) > 0:
         input_data = []
         target_temp = []
 
         input_data = update_input_data()
 
         while True:
-            exibir_tabuleiro()
+            show_board()
             print("-------------------------------------")
-            print("Simbolo atual: " + lista_figuras[0])
+            print("Simbolo atual: " + figures_list[0])
             print("-------------------------------------")
-            result_string = "Simbolos: " + ', '.join(map(str, lista_figuras[1:12]))
+            result_string = "Simbolos: " + ', '.join(map(str, figures_list[1:12]))
             print(result_string)
-            print("X na fila: " + str(count_figuras(lista_figuras, figuras_disponiveis[0])))
-            print("O na fila: " + str(count_figuras(lista_figuras, figuras_disponiveis[1])))
-            print("+ na fila: " + str(count_figuras(lista_figuras, figuras_disponiveis[2])))
-            print("- na fila: " + str(count_figuras(lista_figuras, figuras_disponiveis[3])))
+            print("X na fila: " + str(count_figures(figures_list, available_figures[0])))
+            print("O na fila: " + str(count_figures(figures_list, available_figures[1])))
+            print("+ na fila: " + str(count_figures(figures_list, available_figures[2])))
+            print("- na fila: " + str(count_figures(figures_list, available_figures[3])))
             print("-------------------------------------")
             print("Onde quer colocar o simbolo? (0-24)")
-            posicao = int(input())
-            row, col = index_to_2d(posicao, 5)
-            if tabuleiro[row][col] == " ":
-                tabuleiro[row][col] = lista_figuras[0]
+            position = int(input())
+            row, col = index_to_2d(position, 5)
+            if board[row][col] == " ":
+                board[row][col] = figures_list[0]
                 break
             else:
-                print("Posicao invalida, selecione outra")
+                print("position invalida, selecione outra")
 
 
         for i in range(25):
-            if i != posicao:
+            if i != position:
                 target_temp.append(0)
             else:
                 target_temp.append(1)
 
 
-        score += verificar_macroformas(lista_figuras[0], tabuleiro)
-        score += verificar_microformas(lista_figuras[0], tabuleiro)
-        lista_figuras.pop(0)
+        score += verify_big_forms(figures_list[0], board)
+        score += verify_small_forms(figures_list[0], board)
+        figures_list.pop(0)
         data.append([input_data, target_temp])
         clear_terminal()
 
     cont = 0
     for i in range(5):
         for j in range(5):
-            if tabuleiro[i][j] != " ":
+            if board[i][j] != " ":
                 cont += 1
 
 
     return (score - 2**cont)
 
 
-def exibir_tabuleiro():
+def show_board():
     """
         Prints the board on the console line
     """
-    global tabuleiro
+    global board
 
     print("-" * 9)
-    for linha in tabuleiro:
-        print("|".join(celula for celula in linha))
+    for row in board:
+        print("|".join(cedule for cedule in row))
         print("-" * 9)
 
 
-def main():
-    global tabuleiro
-    global lista_figuras
+#TODO: Change indexes from 0-24 to 1-25 when asking the player to play
+#TODO: Update comments on the file
+#TODO: Make paths variables and have all of them on configurations files
+#TODO: Make logs of everything
+#TODO: When the board is complete stop the game
 
-    existing_data = None
-    with open('Database/database.json', 'r') as file:
-        existing_data = json.load(file)
 
-    tabuleiro = [[" " for _ in range(5)] for _ in range(5)]
+def select_existing_database():
+    """
+        Function responsible for asking the user what file he wants to use as a database, and
+        load the data inside it to program memory
 
-    gerar_fila_figuras()
+        Returns
+        -------
+        return_file
+            Returns name of the file choosen to be used as the database
 
+    """
+    global existing_data
+    files = []
+    for (dirpath, dirnames, filenames) in os.walk('Database'):
+        files.extend(filenames)
     
+    while True:
+        count = 1
+        print("Choose the database file: ")
+        print("--------------------------")
+        for file in files:
+            print("[{}] - {}".format(count, file))
+            count += 1
+        
+        print("[0] - Sair")
+        ans = int(input())
+
+        if ans == 0:
+            exit()
+        else:
+            try:
+                return_file = files[ans-1]
+                database_file_path = "Database/" + return_file
+                with open(database_file_path, 'r') as file:
+                    existing_data = json.load(file)
+                return(return_file)
+            except IndexError:
+                clear_terminal()
+                print("Invalid option \n")
+                continue
+            except:
+                print("An error occured")
+                exit()
+
+
+def create_new_database():
+    """
+        Function responsible for asking the user the name of the database file that he 
+        wants to create and adding the file to the directory
+
+        Returns
+        -------
+        ans_with_file_extension
+            Returns the name of the file choosen already with the extension
+
+    """
+    files = []
+    for (dirpath, dirnames, filenames) in os.walk('Database'):
+        files.extend(filenames)
+    
+    while True:
+        print("Choose the name for the file: ")
+        print("------------------------------")
+        ans = str(input()).strip()
+        ans_with_file_extension = ans + ".json"
+        matches = 0
+
+        for file in files:
+            if file == ans_with_file_extension:
+                matches = 1
+        
+        if matches == 0:
+            return ans_with_file_extension
+        else:
+            clear_terminal()
+            print("A file with that name already exists! \n")
+        
+
+def display_database_options():
+    """
+        Function responsible for asking the user if he wants to select a database file that 
+        already exists or to create a new file to be used
+
+        Returns
+        -------
+        select_existing_database()
+            Returns the name of the file that was selected by the user
+        
+        create_new_database()
+            Returns the name of the file created by the user
+
+    """
+    while True:
+        print('Select an exising database or create a new one: ')
+        print('------------------------------------------------')
+        print('[1] - Select an existing database')
+        print('[2] - Create a new one')
+        print('[0] - Exit')
+        ans = int(input())
+
+        if ans == 1:
+            clear_terminal()
+            return select_existing_database()
+        if ans == 2:
+            clear_terminal()
+            return create_new_database()
+        if ans == 0:
+            exit()
+        else:
+            print('Not a valid answer!')
+
+
+def main():
+    global board
+    global figures_list
+    global existing_data
+
+    database_file_path = 'Database/' + display_database_options()
+    board = [[" " for _ in range(5)] for _ in range(5)]
+    generate_figures_queue()
     score = simulate_game()
     print("Score: " + str(score))
-
     # Save pairs of input-output in a JSON file
     pairs_list = []
-
     for input_data, target_data in data:
         pairs_list.append({"inputs": input_data, "targets": target_data})
-
     existing_data.extend(pairs_list)
-
-    with open('database.json', 'w') as file:
+    with open(database_file_path, 'w') as file:
         json.dump(existing_data, file, indent=4)
 
     return 0
