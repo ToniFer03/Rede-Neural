@@ -138,8 +138,8 @@ def simulate_game():
             print("+ na fila: " + str(count_figures(figures_list, available_figures[2])))
             print("- na fila: " + str(count_figures(figures_list, available_figures[3])))
             print("-------------------------------------")
-            print("Onde quer colocar o simbolo? (0-24)")
-            position = int(input())
+            print("Onde quer colocar o simbolo? (1-25)")
+            position = int(input()) - 1
             row, col = index_to_2d(position, 5)
             if board[row][col] == " ":
                 board[row][col] = figures_list[0]
@@ -160,6 +160,15 @@ def simulate_game():
         figures_list.pop(0)
         data.append([input_data, target_temp])
         clear_terminal()
+
+        figures_in_board = 0
+        for row in board:
+            for col in row:
+                if col != " ":
+                    figures_in_board += 1
+        
+        if figures_in_board == 25:
+            break
 
     cont = 0
     for i in range(5):
@@ -183,9 +192,7 @@ def show_board():
         print("-" * 9)
 
 
-#TODO: Change indexes from 0-24 to 1-25 when asking the player to play
 #TODO: Update comments on the file
-#TODO: Make paths variables and have all of them on configurations files
 #TODO: Make logs of everything
 #TODO: When the board is complete stop the game
 
