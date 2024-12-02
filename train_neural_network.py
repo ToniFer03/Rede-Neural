@@ -40,19 +40,10 @@ warning_logger = None
 error_logger = None
 
 
-# load_configurations is the function responsible for loading the configurations from the configuration file
-#
-#   How it works:
-#   - Funtion opens the configuration file, loads the configurations to the respective global 
-#     variables and closes the file
-#
-#   Parameters:
-#   - Doesnt receive any parameters
-#
-#   Returns:
-#   - Doesnt return anything
-#
 def load_configurarions():
+    """
+        Funtion responsible for loading the configurations to be used on this program from a specific file
+    """
     global number_of_inputs
     global number_of_outputs
     global number_of_hidden_layers
@@ -65,7 +56,6 @@ def load_configurarions():
     try:
         with open('Config\\initial_config.json', 'r') as file:
             configurations = json.load(file)
-        # Continue with processing the configurations if the file was successfully loaded
         debug_logger.debug('JSON file loaded successfully: Config\\initial_config.json')
     except FileNotFoundError:
         error_logger.error('File not found: Config\\initial_config.json')
@@ -85,76 +75,50 @@ def load_configurarions():
 
 
 
-# logging_config is the function responsible for configuring the logging module
-#
-#   How it works:
-#   - Function creates a folder for the logs. Then, it creates loggers for each level and file handlers
-#     for each logger. It also creates a formatter for the log messages. Finally, it adds the handlers
-#     to the loggers and tests logging at different levels.
-#
-#   Parameters:
-#   - Doesnt receive any parameters
-#
-#   Returns:
-#   - Doesnt return anything
-#
 def logging_config():
+    """
+        Funtion responsible for creating a folder for the logs, creating a logger for each level and file
+        handlers for each log and tests the loggers at the end
+    """
     global debug_logger
     global warning_logger
     global error_logger
 
     folder_path = create_folder_for_logs()
 
-    # Remove the basic configuration for the root logger
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    # Create loggers for different levels
     debug_logger = logging.getLogger('debug_logger')
     warning_logger = logging.getLogger('warning_logger')
     error_logger = logging.getLogger('error_logger')
 
-    # Create file handlers for each logger
     debug_handler = logging.FileHandler(os.path.join(folder_path, 'debug.log'))
     warning_handler = logging.FileHandler(os.path.join(folder_path, 'warning.log'))
     error_handler = logging.FileHandler(os.path.join(folder_path, 'error.log'))
 
-    # Set the logging levels for each handler
     debug_handler.setLevel(logging.DEBUG)
     warning_handler.setLevel(logging.WARNING)
     error_handler.setLevel(logging.ERROR)
 
-    # Create a formatter for the log messages
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-    # Set the formatter for each handler
     debug_handler.setFormatter(formatter)
     warning_handler.setFormatter(formatter)
     error_handler.setFormatter(formatter)
 
-    # Add the handlers to the loggers
     debug_logger.addHandler(debug_handler)
     warning_logger.addHandler(warning_handler)
     error_logger.addHandler(error_handler)
 
-    # Test logging at different levels
     debug_logger.debug('Debug logger set up')
     warning_logger.warning('Warning logger set up')
     error_logger.error('Error logger set up')
 
 
-
-# ask_user_weights is the function responsible for asking the user if he wants to load the weights or use random weights
-#
-#   How it works:
-#   - Function prints the options to the user and waits for an input
-#
-#   Parameters:
-#   - Doesnt receive any parameters
-#
-#   Returns:
-#   - Returns the option chosen by the user
-#
 def ask_user_weights():
+    """
+        Funtion responsible for asking the user how he wants to initialize the weights
+    """
     global debug_logger
 
     print('Load weigths or use random weights?')
@@ -168,25 +132,22 @@ def ask_user_weights():
     return option
 
 
-
-# initialize_weights is the function responsible for initializing the weights and biases
-#
-#   How it works:
-#   - If the user chooses to load weights, the function will first verify if there are any weights
-#     for the specified configuration. If there are, it will load the most recent weights. If there
-#     are no weights, the program will warn the user and exit. It will also load the learning rate
-#     from the most recent folder.
-#   - If the user chooses to use random weights, the function will initialize the weights and biases
-#     with random values.
-#   - If the user chooses to exit, the program will exit.
-#
-#   Parameters:
-#   - weight_option: option chosen by the user
-#
-#   Returns:
-#   - Doesnt return anything
-#
 def initialize_weights(weight_option):
+    """
+        Given the option it will load existing weights, create random ones or exit the program 
+        depending on the option choosen by the user
+
+        Parameters
+        ----------
+        weight_option
+            The option choosen by the user when asked how the weights should be initilized
+
+        Returns
+        -------
+        count
+            Number of occurances of that figure on the list
+
+    """
     global weights_layer1
     global biases_layer1
     global weights_layer2
@@ -241,27 +202,17 @@ def initialize_weights(weight_option):
         exit()
 
 
-
-# load_training_data is the function responsible for loading the training data from the database
-#
-#   How it works:
-#   - Function opens the database file, loads the training data to the respective global
-#     variables and closes the file
-#
-#   Parameters:
-#   - Doesnt receive any parameters
-#
-#   Returns:
-#   - Doesnt return anything
-#
 def load_training_data():
+    """
+        Funtion responsible for loading the training data from teh database, with which the neural network
+        will be trained
+    """
     global training_inputs
     global training_targets
 
     try:
         with open('Database\database.json', 'r') as file:
             training_data_list = json.load(file)
-        # Continue with processing the configurations if the file was successfully loaded
         debug_logger.debug('JSON file loaded successfully.')
     except FileNotFoundError:
         error_logger.error('File not found: Database\database.json')
@@ -271,7 +222,6 @@ def load_training_data():
         error_logger.error(f'An unexpected error occurred: {e}')
 
     
-    # Extract inputs and targets from the list of objects
     training_inputs = [obj['inputs'] for obj in training_data_list]
     training_targets = [obj['targets'] for obj in training_data_list]
 
@@ -279,19 +229,10 @@ def load_training_data():
     training_targets = np.array(training_targets)
 
 
-
-# initialize_objects is the function responsible for initializing the objects
-#
-#   How it works:
-#   - Function initializes the objects with the respective parameters
-#
-#   Parameters:
-#   - Doesnt receive any parameters
-#
-#   Returns:
-#   - Doesnt return anything
-#
 def initialize_objects():
+    """
+        Funtion responsible for initializing the objects from the neural network
+    """
     global hidden_layer1
     global hidden_layer2
     global hidden_layer3
@@ -308,22 +249,11 @@ def initialize_objects():
     optimizer = classes.Optimizer_SGD(learning_rate)
 
 
-
-# train_data is the function responsible for training the data
-#
-#   How it works:
-#   - Function trains the data loaded from the database, using the objects initialized
-#     in the previous function. Uses the forward method to calculate the output and the
-#     backward method to calculate the gradients and update the weights and biases. If 
-#     the loss is greater than the last loss, the learning rate is decreased.
-#
-#   Parameters:
-#   - Doesnt receive any parameters
-#
-#   Returns:
-#   - Doesnt return anything
-#
 def train_data():
+    """
+        Funtion responsible for using the training data loaded into the program and improve the neural network
+        to obtain better results
+    """
     global training_inputs
     global training_targets
     global hidden_layer1
@@ -339,7 +269,6 @@ def train_data():
     number_increases = 1
 
     for epoch in range(number_of_epochs):
-        # Forward pass
         hidden_layer1.forward(training_inputs)
         activation1.forward(hidden_layer1.output)
 
@@ -358,7 +287,6 @@ def train_data():
             debug_logger.debug(f'Leaning rate too low. Epoch: {epoch}')
             return
 
-        # Backward pass
         loss_activation.backward(loss_activation.output, training_targets)
         hidden_layer3.backward(loss_activation.dinputs)
         
@@ -368,7 +296,6 @@ def train_data():
         activation1.backward(hidden_layer2.dinputs)
         hidden_layer1.backward(activation1.dinputs)
 
-        # Update weights and biases
         optimizer.update_params(hidden_layer1)
         optimizer.update_params(hidden_layer2)
         optimizer.update_params(hidden_layer3)
@@ -415,6 +342,15 @@ def train_data():
 #   Returns:
 #   - Doesnt return anything
 def save_weights(folder_path):
+    """
+        Funtion responsible for saving the new improved weights and biases
+
+        Parameters
+        ----------
+        folder_path
+            Path where the data will be saved
+
+    """
     try:
         np.savetxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'), hidden_layer1.weights)
         np.savetxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'), hidden_layer1.biases)
@@ -428,22 +364,11 @@ def save_weights(folder_path):
         error_logger.error(f'An unexpected error occurred: {e}')
 
 
-
-# create_folder_for_weights is the function responsible for creating a folder to save the weights
-#
-#   How it works:
-#   - Function creates a variable that holds the current timestamp. Verifies if a folder 
-#   for this neural network configuration already exists. If it doesnt, it creates a folder 
-#   for the current configuration with the name "Weights_number_of_hidden_layers_size_hidden_layers".
-#   Then, it creates a folder inside the previous folder with the current timestamp as the name.
-#
-#   Parameters:
-#   - Doesnt receive any parameters
-#
-#   Returns:
-#   - Returns the path to the folder where the weights will be saved
-#
 def create_folder_for_weights():
+    """
+        Creates a folder for the weigts according to the neural network architechure as well as the data and 
+        time when the saving is happening
+    """
     current_directory = os.getcwd()
     folder_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -475,22 +400,10 @@ def create_folder_for_weights():
     return folder_path
 
 
-
-# create_folder_for_logs is the function responsible for creating a folder to save the logs
-#
-#   How it works:
-#   - Function creates a variable that holds the current timestamp. Verifies if a folder
-#   for the logs already exists. If it doesnt, it creates a folder for the logs with the
-#   name "Logs". Then, it creates a folder inside the previous folder with the current
-#   timestamp as the name.
-#
-#   Parameters:
-#   - Doesnt receive any parameters
-#
-#   Returns:
-#   - Returns the path to the folder where the logs will be saved
-#
 def create_folder_for_logs():
+    """
+        Funtion responsible for creating a folder to save the logs
+    """
     current_directory = os.getcwd()
     string = "Train_Neural_Network_"
     string2 = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -510,20 +423,10 @@ def create_folder_for_logs():
     return folder_path
 
 
-
-# get_most_recent_folder is the function responsible for getting the most recent folder
-#
-#   How it works:
-#   - Function saves the names of all the folders inside the specified folder to a list. Then,
-#   it converts the names to datetime objects and gets the most recent folder.
-#
-#   Parameters:
-#   - folder_path: path to the folder where the weights for a certain configuration are saved
-#
-#   Returns:
-#   - Returns the name of the most recent folder
-#
 def get_most_recent_folder(folder_path):
+    """
+        Function responsible for getting the most recent folder
+    """
     folders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
 
     if not folders:

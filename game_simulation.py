@@ -35,8 +35,11 @@ board = []
 
 
 
-# Gerar fila random de simbolos
 def generate_figures_queue():
+    """
+        Funtion responsible for generating a queue of random figures to be played
+
+    """
     global figures_list
     global available_figures
 
@@ -46,6 +49,22 @@ def generate_figures_queue():
 
 
 def count_simbolos(figures_list_copy, figure):
+    """
+        Funtion responsible for many figures of a certain type are still left
+
+        Parameters
+        ----------
+        figures_list_copy
+            List that contains all the figures left to be played
+        figure
+            The symbol of which we want to know how many are left
+
+        Returns
+        -------
+        count
+            Number of occurances of that figure on the list
+
+    """
     count = 0
     for i in figures_list_copy:
         if i == figure:
@@ -53,15 +72,16 @@ def count_simbolos(figures_list_copy, figure):
     return count
 
 
-# Função para dar update no input data (FALTA NUMERO DE CADA SIMBOLO NA FILA)
 def update_input_data():
+    """
+        Funtion responsible for updating the input data
+    """
     global board
     global figures_list
     global figures_translation_value
 
     input_data = []
 
-    # Update os primeiros 25 valores do input data com o board
     for i in range(5):
         for j in range(5):
             if board[i][j] == " ":
@@ -69,7 +89,6 @@ def update_input_data():
             else:
                 input_data.append(figures_translation_value[board[i][j]])
 
-    # Update os 12 valores seguintes com os simbolos da lista
     for i in range(12):
         if i < len(figures_list):
             input_data.append(figures_translation_value[figures_list[i]])
@@ -85,17 +104,26 @@ def update_input_data():
     return input_data
 
 
-# Turn an index into a the coordinate of the board
 def index_to_2d(index, num_columns):
+    """
+        Function responsible for turning and index into a coordinate in the board
+    """
     row = index // num_columns
     col = index % num_columns
     return row, col
 
 
-# Define a function to simulate the game and obtain the action (reward)
 def simulate_game():
-    # Replace this with your actual game logic to simulate the game and obtain the action (reward)
-    # Choose an action based on the output layer probabilities
+    """
+        Function responsible for simulating the game and obtaining the final score
+
+        Returns
+        -------
+        score
+            Returns the final score of the game, already deducting the penalties for 
+            the pieces left on the board
+
+    """
     global board
     global figures_list
     global hidden_layer1
@@ -109,7 +137,6 @@ def simulate_game():
     score = 0
     input_data = [0]
     while len(figures_list) > 0:
-        # Update input data based on the current game state
         input_data[0] = update_input_data()
         hidden_layer1.forward(input_data)
         linear_activation.forward(hidden_layer1.output)
@@ -118,7 +145,6 @@ def simulate_game():
         hidden_layer3.forward(linear_activation.output)
         softmax_activation.forward(hidden_layer3.output)
 
-        # Get action from output layer probabilities
         flattened_output = softmax_activation.output.flatten()
         sorted_actions = sorted(range(len(flattened_output)), key=lambda k: flattened_output[k], reverse=True)
 
@@ -134,18 +160,15 @@ def simulate_game():
         show_board()
 
         if i == 25:
-            # Game over
             return (score - 2**25) 
 
 
-        # Verificar simbolo, update no score e retirar simbolo da lista
         score += verify_big_forms(figures_list[0], board)
         score += verify_small_forms(figures_list[0], board)
         store_inputs.append(input_data[0])
         
         figures_list.pop(0)
 
-    # Numero de peças no board
     cont = 0
     for i in range(5):
         for j in range(5):
@@ -157,6 +180,9 @@ def simulate_game():
 
 
 def initialize_objects():
+    """
+        Funtion responsible for initializing the objects from the neural network
+    """
     global hidden_layer1
     global hidden_layer2
     global hidden_layer3
@@ -171,18 +197,38 @@ def initialize_objects():
     softmax_activation = classes.Activation_Softmax()
 
 
-# Função para exibir o board
 def show_board():
+    """
+        Prints the board on the console line
+    """
     global board
 
-    print("-" * 9)
-    for linha in board:
-        print("|".join(celula for celula in linha))
-        print("-" * 9)
+    print("-" * 24)
+    count = 1
+    for row in board:
+        row_text = ""
+        for cedule in row:
+            row_text = row_text + "| "
+
+            if(cedule == ' '):
+                if(count < 10):
+                    row_text = row_text + "0" + str(count) + " "
+                else:
+                    row_text = row_text + str(count) + " "
+            else:
+                row_text = row_text + cedule + "  "
+            count += 1
+        
+        print(row_text)
+        print("-" * 24)
 
 
 
 def load_weights():
+    """
+        Funtion responsible for loading the weights and biasies to be used while 
+        simulating the game
+    """
     global weights_layer1
     global biases_layer1
     global weights_layer2
@@ -215,6 +261,9 @@ def load_weights():
 
 
 def get_most_recent_folder(folder_path):
+    """
+        Function responsible for getting the most recent folder
+    """
     folders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
 
     if not folders:
@@ -231,6 +280,9 @@ def get_most_recent_folder(folder_path):
 
 
 def ask_for_config():
+    """
+        Function responsible for asking the users for the neural network configuration
+    """
     global number_of_hidden_layers
     global size_hidden_layers
 
@@ -238,6 +290,11 @@ def ask_for_config():
     size_hidden_layers = int(input('Size of hidden layers: ')).__int__()
 
 
+#TODO: Dont load by most recent folder ask the user what folder he wants to use, leave the most recent function it can be usefull
+#TODO: Dont ask the user for a configuration, obtain it by the folder name
+#TODO: Dont have the layers, weights and biasies be written into the code create them following the folder names
+#TODO: At the end ask if the user wants to play again
+#TODO: Ask the user if he wants a random generated queue or a specific one to be created by him
 
 def main():
     global board

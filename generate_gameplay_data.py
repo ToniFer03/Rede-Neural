@@ -11,6 +11,7 @@ available_figures = ['X', 'O', '+', '-']
 board = []
 data = []
 existing_data = []
+database_dir = "Database/"
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -18,7 +19,7 @@ def clear_terminal():
 
 def generate_figures_queue():
     """
-        Function responsible for generating a list of random predetermined symbols
+        Function responsible for generating a list of random predetermined figures
     """
     global figures_list
     global available_figures
@@ -30,20 +31,20 @@ def generate_figures_queue():
 
 def count_figures(figures_list_copy, figure):
     """
-        Funtion responsible for counting how many of a certain symbols are still
+        Funtion responsible for counting how many of a certain figures are still
         left on list
 
         Parameters
         ----------
         lista
-            List that contains all the symbols left to be played
+            List that contains all the figures left to be played
         simbolo
             The symbol of which we want to know how many are left
 
         Returns
         -------
         count
-            Number of occurances of that symbol on the list
+            Number of occurances of that figures on the list
 
     """
     count = 0
@@ -57,8 +58,8 @@ def update_input_data():
     """
         Function responsible for storing the current state of the game after 
         each play, first 25 values are reserved for the board state and the next 
-        12 to the next symbols in line, the last one is reserved to the numbers
-        of symbols left
+        12 to the next figures in line, the last one is reserved to the numbers
+        of figures left
 
         Returns
         -------
@@ -186,15 +187,24 @@ def show_board():
     """
     global board
 
-    print("-" * 9)
+    print("-" * 24)
+    count = 1
     for row in board:
-        print("|".join(cedule for cedule in row))
-        print("-" * 9)
+        row_text = ""
+        for cedule in row:
+            row_text = row_text + "| "
 
-
-#TODO: Update comments on the file
-#TODO: Make logs of everything
-#TODO: When the board is complete stop the game
+            if(cedule == ' '):
+                if(count < 10):
+                    row_text = row_text + "0" + str(count) + " "
+                else:
+                    row_text = row_text + str(count) + " "
+            else:
+                row_text = row_text + cedule + "  "
+            count += 1
+        
+        print(row_text)
+        print("-" * 24)
 
 
 def select_existing_database():
@@ -229,7 +239,7 @@ def select_existing_database():
         else:
             try:
                 return_file = files[ans-1]
-                database_file_path = "Database/" + return_file
+                database_file_path = database_dir + return_file
                 with open(database_file_path, 'r') as file:
                     existing_data = json.load(file)
                 return(return_file)
@@ -314,12 +324,12 @@ def main():
     global figures_list
     global existing_data
 
-    database_file_path = 'Database/' + display_database_options()
+    clear_terminal()
+    database_file_path = database_dir + display_database_options()
     board = [[" " for _ in range(5)] for _ in range(5)]
     generate_figures_queue()
     score = simulate_game()
     print("Score: " + str(score))
-    # Save pairs of input-output in a JSON file
     pairs_list = []
     for input_data, target_data in data:
         pairs_list.append({"inputs": input_data, "targets": target_data})
