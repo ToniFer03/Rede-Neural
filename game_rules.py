@@ -375,7 +375,10 @@ def verify_small_forms(figure, board):
     temp_score = 0
     num_correspondances = 0
 
+<<<<<<< HEAD
     # X
+=======
+>>>>>>> feat/loading_storing
     if figure == available_figures[0]:
         if verify_five_figure_x(board):
             temp_all_positions = positions_x[1:]
@@ -395,7 +398,10 @@ def verify_small_forms(figure, board):
             temp_score = 32
 
 
+<<<<<<< HEAD
     # Cross
+=======
+>>>>>>> feat/loading_storing
     elif figure == available_figures[2]:
         if verify_five_figure_cross(board):
             temp_all_positions = positions_cross[1:]
@@ -415,7 +421,10 @@ def verify_small_forms(figure, board):
             temp_score = 32
 
 
+<<<<<<< HEAD
     # Circle
+=======
+>>>>>>> feat/loading_storing
     elif figure == available_figures[1]:
         if verify_four_figure_circle(board):
             temp_all_positions = positions_circle[9:]
@@ -435,7 +444,10 @@ def verify_small_forms(figure, board):
             temp_score = 16  
 
     
+<<<<<<< HEAD
     # Dash
+=======
+>>>>>>> feat/loading_storing
     elif figure == available_figures[3]:
         if verify_two_figure_dash(board):
             temp_all_positions = positions_dash[15:]
@@ -485,7 +497,10 @@ def verify_big_forms(figure, board):
     temp_score = 0
     num_correspondances = 0
 
+<<<<<<< HEAD
     # X
+=======
+>>>>>>> feat/loading_storing
     if figure == available_figures[0]: 
         if verify_nine_figure_x(board):
             positions_list = positions_x[0]
@@ -494,7 +509,10 @@ def verify_big_forms(figure, board):
             temp_score = 512
 
 
+<<<<<<< HEAD
     # Cross
+=======
+>>>>>>> feat/loading_storing
     elif figure == available_figures[2]:
         if verify_nine_figure_cross(board):
             positions_list = positions_cross[0]
@@ -503,7 +521,10 @@ def verify_big_forms(figure, board):
             temp_score = 512
 
 
+<<<<<<< HEAD
     # Circle
+=======
+>>>>>>> feat/loading_storing
     elif figure == available_figures[1]:
         if verify_eight_figure_circle(board):
             temp_all_positions = positions_circle[:9]
@@ -523,7 +544,10 @@ def verify_big_forms(figure, board):
             temp_score = 256
 
 
+<<<<<<< HEAD
     # Dash
+=======
+>>>>>>> feat/loading_storing
     elif figure == available_figures[3]:
         if verify_three_figure_dash(board):
             temp_all_positions = positions_dash[:15]

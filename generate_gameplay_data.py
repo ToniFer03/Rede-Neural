@@ -10,6 +10,8 @@ figures_translation_value = {'X': 1, 'O': 2, '+': 3, '-': 4}
 available_figures = ['X', 'O', '+', '-']
 board = []
 data = []
+existing_data = []
+database_dir = "Database/"
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -17,7 +19,7 @@ def clear_terminal():
 
 def generate_figures_queue():
     """
-        Function responsible for generating a list of random predetermined symbols
+        Function responsible for generating a list of random predetermined figures
     """
     global figures_list
     global available_figures
@@ -29,20 +31,20 @@ def generate_figures_queue():
 
 def count_figures(figures_list_copy, figure):
     """
-        Funtion responsible for counting how many of a certain symbols are still
+        Funtion responsible for counting how many of a certain figures are still
         left on list
 
         Parameters
         ----------
         lista
-            List that contains all the symbols left to be played
+            List that contains all the figures left to be played
         simbolo
             The symbol of which we want to know how many are left
 
         Returns
         -------
         count
-            Number of occurances of that symbol on the list
+            Number of occurances of that figures on the list
 
     """
     count = 0
@@ -56,8 +58,8 @@ def update_input_data():
     """
         Function responsible for storing the current state of the game after 
         each play, first 25 values are reserved for the board state and the next 
-        12 to the next symbols in line, the last one is reserved to the numbers
-        of symbols left
+        12 to the next figures in line, the last one is reserved to the numbers
+        of figures left
 
         Returns
         -------
@@ -137,8 +139,13 @@ def simulate_game():
             print("+ na fila: " + str(count_figures(figures_list, available_figures[2])))
             print("- na fila: " + str(count_figures(figures_list, available_figures[3])))
             print("-------------------------------------")
+<<<<<<< HEAD
             print("Onde quer colocar o simbolo? (0-24)")
             position = int(input())
+=======
+            print("Onde quer colocar o simbolo? (1-25)")
+            position = int(input()) - 1
+>>>>>>> feat/loading_storing
             row, col = index_to_2d(position, 5)
             if board[row][col] == " ":
                 board[row][col] = figures_list[0]
@@ -160,6 +167,15 @@ def simulate_game():
         data.append([input_data, target_temp])
         clear_terminal()
 
+        figures_in_board = 0
+        for row in board:
+            for col in row:
+                if col != " ":
+                    figures_in_board += 1
+        
+        if figures_in_board == 25:
+            break
+
     cont = 0
     for i in range(5):
         for j in range(5):
@@ -176,15 +192,149 @@ def show_board():
     """
     global board
 
+<<<<<<< HEAD
     print("-" * 9)
     for row in board:
         print("|".join(cedule for cedule in row))
         print("-" * 9)
+=======
+    print("-" * 24)
+    count = 1
+    for row in board:
+        row_text = ""
+        for cedule in row:
+            row_text = row_text + "| "
+
+            if(cedule == ' '):
+                if(count < 10):
+                    row_text = row_text + "0" + str(count) + " "
+                else:
+                    row_text = row_text + str(count) + " "
+            else:
+                row_text = row_text + cedule + "  "
+            count += 1
+        
+        print(row_text)
+        print("-" * 24)
+
+
+def select_existing_database():
+    """
+        Function responsible for asking the user what file he wants to use as a database, and
+        load the data inside it to program memory
+
+        Returns
+        -------
+        return_file
+            Returns name of the file choosen to be used as the database
+
+    """
+    global existing_data
+    files = []
+    for (dirpath, dirnames, filenames) in os.walk('Database'):
+        files.extend(filenames)
+    
+    while True:
+        count = 1
+        print("Choose the database file: ")
+        print("--------------------------")
+        for file in files:
+            print("[{}] - {}".format(count, file))
+            count += 1
+        
+        print("[0] - Sair")
+        ans = int(input())
+
+        if ans == 0:
+            exit()
+        else:
+            try:
+                return_file = files[ans-1]
+                database_file_path = database_dir + return_file
+                with open(database_file_path, 'r') as file:
+                    existing_data = json.load(file)
+                return(return_file)
+            except IndexError:
+                clear_terminal()
+                print("Invalid option \n")
+                continue
+            except:
+                print("An error occured")
+                exit()
+
+
+def create_new_database():
+    """
+        Function responsible for asking the user the name of the database file that he 
+        wants to create and adding the file to the directory
+
+        Returns
+        -------
+        ans_with_file_extension
+            Returns the name of the file choosen already with the extension
+
+    """
+    files = []
+    for (dirpath, dirnames, filenames) in os.walk('Database'):
+        files.extend(filenames)
+    
+    while True:
+        print("Choose the name for the file: ")
+        print("------------------------------")
+        ans = str(input()).strip()
+        ans_with_file_extension = ans + ".json"
+        matches = 0
+
+        for file in files:
+            if file == ans_with_file_extension:
+                matches = 1
+        
+        if matches == 0:
+            return ans_with_file_extension
+        else:
+            clear_terminal()
+            print("A file with that name already exists! \n")
+        
+
+def display_database_options():
+    """
+        Function responsible for asking the user if he wants to select a database file that 
+        already exists or to create a new file to be used
+
+        Returns
+        -------
+        select_existing_database()
+            Returns the name of the file that was selected by the user
+        
+        create_new_database()
+            Returns the name of the file created by the user
+
+    """
+    while True:
+        print('Select an exising database or create a new one: ')
+        print('------------------------------------------------')
+        print('[1] - Select an existing database')
+        print('[2] - Create a new one')
+        print('[0] - Exit')
+        ans = int(input())
+
+        if ans == 1:
+            clear_terminal()
+            return select_existing_database()
+        if ans == 2:
+            clear_terminal()
+            return create_new_database()
+        if ans == 0:
+            exit()
+        else:
+            print('Not a valid answer!')
+>>>>>>> feat/loading_storing
 
 
 def main():
     global board
     global figures_list
+<<<<<<< HEAD
 
     existing_data = None
     with open('Database/database.json', 'r') as file:
@@ -195,19 +345,27 @@ def main():
     generate_figures_queue()
 
     
+=======
+    global existing_data
+
+    clear_terminal()
+    database_file_path = database_dir + display_database_options()
+    board = [[" " for _ in range(5)] for _ in range(5)]
+    generate_figures_queue()
+>>>>>>> feat/loading_storing
     score = simulate_game()
     print("Score: " + str(score))
-
-    # Save pairs of input-output in a JSON file
     pairs_list = []
-
     for input_data, target_data in data:
         pairs_list.append({"inputs": input_data, "targets": target_data})
-
     existing_data.extend(pairs_list)
+<<<<<<< HEAD
 
     #TODO: Update path to database
     with open('database.json', 'w') as file:
+=======
+    with open(database_file_path, 'w') as file:
+>>>>>>> feat/loading_storing
         json.dump(existing_data, file, indent=4)
 
     return 0
