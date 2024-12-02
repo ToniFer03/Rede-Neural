@@ -319,7 +319,7 @@ def display_database_options():
             print('Not a valid answer!')
 
 
-def main():
+def generate_gameplay_data_main():
     global board
     global figures_list
     global existing_data
@@ -338,6 +338,3 @@ def main():
         json.dump(existing_data, file, indent=4)
 
     return 0
-
-
-main()

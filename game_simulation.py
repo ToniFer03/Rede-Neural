@@ -288,15 +288,9 @@ def ask_for_config():
 
     number_of_hidden_layers = int(input('Number of hidden layers: ')).__int__()
     size_hidden_layers = int(input('Size of hidden layers: ')).__int__()
+    
 
-
-#TODO: Dont load by most recent folder ask the user what folder he wants to use, leave the most recent function it can be usefull
-#TODO: Dont ask the user for a configuration, obtain it by the folder name
-#TODO: Dont have the layers, weights and biasies be written into the code create them following the folder names
-#TODO: At the end ask if the user wants to play again
-#TODO: Ask the user if he wants a random generated queue or a specific one to be created by him
-
-def main():
+def game_simulation_main():
     global board
     global figures_list
     global store_inputs

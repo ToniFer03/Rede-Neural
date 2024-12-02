@@ -442,7 +442,7 @@ def get_most_recent_folder(folder_path):
 
 
 
-def main():
+def train_neural_network_main():
     logging_config()
     load_configurarions()
     weight_option = ask_user_weights()
@@ -452,6 +452,3 @@ def main():
     train_data()
     folder_path = create_folder_for_weights()
     save_weights(folder_path)
-
-
-main()
