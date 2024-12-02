@@ -139,13 +139,8 @@ def simulate_game():
             print("+ na fila: " + str(count_figures(figures_list, available_figures[2])))
             print("- na fila: " + str(count_figures(figures_list, available_figures[3])))
             print("-------------------------------------")
-<<<<<<< HEAD
-            print("Onde quer colocar o simbolo? (0-24)")
-            position = int(input())
-=======
             print("Onde quer colocar o simbolo? (1-25)")
             position = int(input()) - 1
->>>>>>> feat/loading_storing
             row, col = index_to_2d(position, 5)
             if board[row][col] == " ":
                 board[row][col] = figures_list[0]
@@ -192,12 +187,6 @@ def show_board():
     """
     global board
 
-<<<<<<< HEAD
-    print("-" * 9)
-    for row in board:
-        print("|".join(cedule for cedule in row))
-        print("-" * 9)
-=======
     print("-" * 24)
     count = 1
     for row in board:
@@ -328,44 +317,24 @@ def display_database_options():
             exit()
         else:
             print('Not a valid answer!')
->>>>>>> feat/loading_storing
 
 
 def main():
     global board
     global figures_list
-<<<<<<< HEAD
-
-    existing_data = None
-    with open('Database/database.json', 'r') as file:
-        existing_data = json.load(file)
-
-    board = [[" " for _ in range(5)] for _ in range(5)]
-
-    generate_figures_queue()
-
-    
-=======
     global existing_data
 
     clear_terminal()
     database_file_path = database_dir + display_database_options()
     board = [[" " for _ in range(5)] for _ in range(5)]
     generate_figures_queue()
->>>>>>> feat/loading_storing
     score = simulate_game()
     print("Score: " + str(score))
     pairs_list = []
     for input_data, target_data in data:
         pairs_list.append({"inputs": input_data, "targets": target_data})
     existing_data.extend(pairs_list)
-<<<<<<< HEAD
-
-    #TODO: Update path to database
-    with open('database.json', 'w') as file:
-=======
     with open(database_file_path, 'w') as file:
->>>>>>> feat/loading_storing
         json.dump(existing_data, file, indent=4)
 
     return 0
