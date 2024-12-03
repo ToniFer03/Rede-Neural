@@ -20,11 +20,13 @@ def main():
 
         if ans == 1:
             generate_gameplay_data_main()
-            #TODO: Clear the terminal after selecting a database
+            #TODO: Option for the user undo the last move
             continue
         
         if ans == 2:
             train_neural_network_main()
+            #TODO: At the end save the best weights and biases not the last ones
+            #TODO: Clear terminals
             continue
 
         if ans == 3:
@@ -32,7 +34,6 @@ def main():
             #TODO: Dont load by most recent folder ask the user what folder he wants to use, leave the most recent function it can be usefull
             #TODO: Dont ask the user for a configuration, obtain it by the folder name
             #TODO: Dont have the layers, weights and biasies be written into the code create them following the folder names
-            #TODO: At the end ask if the user wants to play again
             #TODO: Ask the user if he wants a random generated queue or a specific one to be created by him
             continue
 

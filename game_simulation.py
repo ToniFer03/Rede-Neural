@@ -237,7 +237,8 @@ def load_weights():
     global biases_layer3
 
     string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
-    folder_path = os.path.join(os.getcwd(), string)
+    current_directory = os.getcwd() + "\Weights"
+    folder_path = os.path.join(current_directory, string)
 
     if not os.path.exists(folder_path):
         print('No weights found for this configurarion!')

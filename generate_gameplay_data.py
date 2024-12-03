@@ -242,6 +242,7 @@ def select_existing_database():
                 database_file_path = database_dir + return_file
                 with open(database_file_path, 'r') as file:
                     existing_data = json.load(file)
+                clear_terminal()
                 return(return_file)
             except IndexError:
                 clear_terminal()

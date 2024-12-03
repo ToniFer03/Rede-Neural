@@ -64,7 +64,6 @@ def load_configurarions():
     except Exception as e:
         error_logger.error(f'An unexpected error occurred: {e}')
 
-    
     number_of_inputs = configurations['number_of_inputs']
     number_of_outputs = configurations['number_of_outputs']
     size_hidden_layers = configurations['size_hidden_layers']
@@ -159,9 +158,10 @@ def initialize_weights(weight_option):
     global warning_logger
     global error_logger
 
+    current_dir = os.getcwd() + "\Weights"
     if weight_option == 1:
         string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
-        folder_path = os.path.join(os.getcwd(), string)
+        folder_path = os.path.join(current_dir, string)
 
         if not os.path.exists(folder_path):
             warning_logger.warning(f'No weights found for this configurarion! {folder_path}')
@@ -220,7 +220,6 @@ def load_training_data():
         error_logger.error(f'Error decoding JSON: {e}')
     except Exception as e:
         error_logger.error(f'An unexpected error occurred: {e}')
-
     
     training_inputs = [obj['inputs'] for obj in training_data_list]
     training_targets = [obj['targets'] for obj in training_data_list]
@@ -303,8 +302,6 @@ def train_data():
         if epoch % 10000 == 0:
             debug_logger.debug(f'Epoch: {epoch} - Loss: {loss} - Learning rate: {optimizer.learning_rate}')
 
-
-
         if loss < best_loss:
             best_loss = loss
             best_weights_layer1 = hidden_layer1.weights
@@ -324,23 +321,10 @@ def train_data():
             hidden_layer3.weights = best_weights_layer3
             hidden_layer3.biases = best_biases_layer3
             best_loss = float('inf')
-
     
     debug_logger.debug(f'Maximum number of epochs reached. Epoch: {epoch}')
             
-        
 
-
-# save_weights is the function responsible for saving the weights and biases to a file
-#
-#   How it works:
-#   - Function saves the weights and biases to a file
-#
-#   Parameters:
-#   - folder_path: path to the folder where the weights will be saved
-#
-#   Returns:
-#   - Doesnt return anything
 def save_weights(folder_path):
     """
         Funtion responsible for saving the new improved weights and biases
@@ -369,7 +353,7 @@ def create_folder_for_weights():
         Creates a folder for the weigts according to the neural network architechure as well as the data and 
         time when the saving is happening
     """
-    current_directory = os.getcwd()
+    current_directory = os.getcwd() + "\Weights"
     folder_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
@@ -408,18 +392,13 @@ def create_folder_for_logs():
     string = "Train_Neural_Network_"
     string2 = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     folder_name = string + string2
-
     string = "Logs"
-
     logs_directory = os.path.join(current_directory, string)
     if not os.path.exists(os.path.join(current_directory, string)):
         os.makedirs(os.path.join(current_directory, string))
-
     folder_path = os.path.join(logs_directory, folder_name)
-
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
-    
     return folder_path
 
 
@@ -428,16 +407,11 @@ def get_most_recent_folder(folder_path):
         Function responsible for getting the most recent folder
     """
     folders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
-
     if not folders:
         return None
-
     folders_dates = [datetime.datetime.strptime(f, "%Y-%m-%d_%H-%M-%S") for f in folders]
-
     most_recent_folder = max(folders_dates)
-
     most_recent_folder_name = most_recent_folder.strftime("%Y-%m-%d_%H-%M-%S")
-
     return most_recent_folder_name
 
 
