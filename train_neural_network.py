@@ -18,18 +18,11 @@ number_of_epochs = None
 loss = None
 rate_of_decrease = None
 
-# Weights and biases variables
-weights_layer1 = None
-biases_layer1 = None
-weights_layer2 = None
-biases_layer2 = None
-weights_layer3 = None
-biases_layer3 = None
+hidden_layers_array = []
+weights_array = []
+biasies_array = []
 
 # Objects
-hidden_layer1 = None
-hidden_layer2 = None
-hidden_layer3 = None
 activation1 = None
 loss_activation = None
 optimizer = None
@@ -147,21 +140,15 @@ def initialize_weights(weight_option):
             Number of occurances of that figure on the list
 
     """
-    global weights_layer1
-    global biases_layer1
-    global weights_layer2
-    global biases_layer2
-    global weights_layer3
-    global biases_layer3
     global learning_rate
     global debug_logger
     global warning_logger
     global error_logger
 
-    current_dir = os.getcwd() + "\Weights"
     if weight_option == 1:
         string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
-        folder_path = os.path.join(current_dir, string)
+        current_directory = os.getcwd() + "\Weights"
+        folder_path = os.path.join(current_directory, string)
 
         if not os.path.exists(folder_path):
             warning_logger.warning(f'No weights found for this configurarion! {folder_path}')
@@ -172,17 +159,18 @@ def initialize_weights(weight_option):
                 most_recent_folder = get_most_recent_folder(folder_path)
                 folder_path = os.path.join(folder_path, most_recent_folder)
 
-                weights_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'))
-                biases_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'))
-                biases_layer1 = biases_layer1.reshape(1, size_hidden_layers)
+                for layer_number in range(number_of_hidden_layers + 1):
+                    fileNameWeights = 'hidden_layer' + str(layer_number+1) + '_weights.txt'
+                    fileNameBiases = 'hidden_layer' + str(layer_number+1) + '_biases.txt'
+                    weights_array.append([])
+                    biasies_array.append([])
+                    weights_array[layer_number] = np.loadtxt(os.path.join(folder_path, fileNameWeights))
+                    biasies_array[layer_number] = np.loadtxt(os.path.join(folder_path, fileNameBiases))
 
-                weights_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'))
-                biases_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'))
-                biases_layer2 = biases_layer2.reshape(1, size_hidden_layers)
-
-                weights_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'))
-                biases_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'))
-                biases_layer3 = biases_layer3.reshape(1, number_of_outputs)
+                    if layer_number == number_of_hidden_layers:
+                        biasies_array[layer_number] = biasies_array[layer_number].reshape(1, 25)
+                    else:
+                        biasies_array[layer_number] = biasies_array[layer_number].reshape(1, size_hidden_layers)
 
                 learning_rate = np.loadtxt(os.path.join(folder_path, 'learning_rate.txt'))
             except FileNotFoundError:
@@ -191,12 +179,11 @@ def initialize_weights(weight_option):
                 error_logger.error(f'An unexpected error occurred: {e}')
 
     elif weight_option == 2:
-        weights_layer1 = None
-        biases_layer1 = None
-        weights_layer2 = None
-        biases_layer2 = None
-        weights_layer3 = None
-        biases_layer3 = None
+        for layer_number in range(number_of_hidden_layers + 1):
+            weights_array.append([])
+            biasies_array.append([])
+            weights_array[layer_number] = None
+            biasies_array[layer_number] = None
     
     elif weight_option == 3:
         exit()
@@ -232,16 +219,18 @@ def initialize_objects():
     """
         Funtion responsible for initializing the objects from the neural network
     """
-    global hidden_layer1
-    global hidden_layer2
-    global hidden_layer3
     global activation1
     global loss_activation
     global optimizer
+    
+    global hidden_layers_array
+    global weights_array
+    global biasies_array
+    global number_of_hidden_layers
 
-    hidden_layer1 = classes.Layer_Dense(number_of_inputs, size_hidden_layers, weights_layer1, biases_layer1) 
-    hidden_layer2 = classes.Layer_Dense(size_hidden_layers, size_hidden_layers, weights_layer2, biases_layer2) 
-    hidden_layer3 = classes.Layer_Dense(size_hidden_layers, number_of_outputs, weights_layer3, biases_layer3)
+    for num in range(number_of_hidden_layers+1):
+        hidden_layers_array.append([])
+        hidden_layers_array[num] = classes.Layer_Dense(None, None, weights_array[num], biasies_array[num])
 
     activation1 = classes.Activation_ReLU()
     loss_activation = classes.Activation_Softmax_Loss_CategoricalCrossentropy()
@@ -255,19 +244,28 @@ def train_data():
     """
     global training_inputs
     global training_targets
-    global hidden_layer1
-    global hidden_layer2
-    global hidden_layer3
     global activation1
     global loss_activation
     global optimizer
     global rate_of_decrease
     global debug_logger
 
-    best_loss = float('inf')
-    number_increases = 1
+    global hidden_layers_array
+    global number_of_hidden_layers
+
 
     for epoch in range(number_of_epochs):
+        hidden_layers_array[0].forward(training_inputs)
+        activation1.forward(hidden_layers_array[0].output)
+        for num in range(1, number_of_hidden_layers+1):
+            hidden_layers_array[num].forward(activation1.output)
+            
+            if num != number_of_hidden_layers:
+                activation1.forward(hidden_layers_array[num].output)
+
+        loss = loss_activation.forward(hidden_layers_array[number_of_hidden_layers].output, training_targets)
+       
+        """
         hidden_layer1.forward(training_inputs)
         activation1.forward(hidden_layer1.output)
 
@@ -276,6 +274,7 @@ def train_data():
 
         hidden_layer3.forward(activation1.output)
         loss = loss_activation.forward(hidden_layer3.output, training_targets)
+        """
 
         if epoch % 10000 == 0:
             print(f'loss: {loss}')
@@ -286,7 +285,7 @@ def train_data():
             debug_logger.debug(f'Leaning rate too low. Epoch: {epoch}')
             return
 
-        loss_activation.backward(loss_activation.output, training_targets)
+        """
         hidden_layer3.backward(loss_activation.dinputs)
         
         activation1.backward(hidden_layer3.dinputs)
@@ -298,29 +297,23 @@ def train_data():
         optimizer.update_params(hidden_layer1)
         optimizer.update_params(hidden_layer2)
         optimizer.update_params(hidden_layer3)
+        """
+
+        loss_activation.backward(loss_activation.output, training_targets)
+        hidden_layers_array[number_of_hidden_layers].backward(loss_activation.dinputs)
+
+        num = number_of_hidden_layers
+        while(num > 0):
+            activation1.backward(hidden_layers_array[num].dinputs)
+            hidden_layers_array[num-1].backward(activation1.dinputs)
+            num = num - 1
+
+        for layer in hidden_layers_array:
+            optimizer.update_params(layer)
+
 
         if epoch % 10000 == 0:
             debug_logger.debug(f'Epoch: {epoch} - Loss: {loss} - Learning rate: {optimizer.learning_rate}')
-
-        if loss < best_loss:
-            best_loss = loss
-            best_weights_layer1 = hidden_layer1.weights
-            best_biases_layer1 = hidden_layer1.biases
-            best_weights_layer2 = hidden_layer2.weights
-            best_biases_layer2 = hidden_layer2.biases
-            best_weights_layer3 = hidden_layer3.weights
-            best_biases_layer3 = hidden_layer3.biases
-        
-        if (epoch + 1) % (number_increases * 50000) == 0:
-            optimizer.update_learning_rate(optimizer.learning_rate * rate_of_decrease)	
-            number_increases += 1	        	
-            hidden_layer1.weights = best_weights_layer1
-            hidden_layer1.biases = best_biases_layer1
-            hidden_layer2.weights = best_weights_layer2
-            hidden_layer2.biases = best_biases_layer2
-            hidden_layer3.weights = best_weights_layer3
-            hidden_layer3.biases = best_biases_layer3
-            best_loss = float('inf')
     
     debug_logger.debug(f'Maximum number of epochs reached. Epoch: {epoch}')
             
@@ -335,13 +328,16 @@ def save_weights(folder_path):
             Path where the data will be saved
 
     """
+    global hidden_layers_array
+    global number_of_hidden_layers
+
     try:
-        np.savetxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'), hidden_layer1.weights)
-        np.savetxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'), hidden_layer1.biases)
-        np.savetxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'), hidden_layer2.weights)
-        np.savetxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'), hidden_layer2.biases)
-        np.savetxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'), hidden_layer3.weights)
-        np.savetxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'), hidden_layer3.biases)
+        for layer_number in range(number_of_hidden_layers + 1):
+            fileNameWeights = 'hidden_layer' + str(layer_number+1) + '_weights.txt'
+            fileNameBiases = 'hidden_layer' + str(layer_number+1) + '_biases.txt'
+            np.savetxt(os.path.join(folder_path, fileNameWeights), hidden_layers_array[layer_number].weights)
+            np.savetxt(os.path.join(folder_path, fileNameBiases), hidden_layers_array[layer_number].biases)
+        
         np.savetxt(os.path.join(folder_path, 'learning_rate.txt'), np.array([optimizer.learning_rate]))
         np.savetxt(os.path.join(folder_path, 'loss.txt'), np.array([loss]))
     except Exception as e:

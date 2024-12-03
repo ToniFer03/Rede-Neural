@@ -18,6 +18,7 @@ def main():
         print('[0] - Exit')
         ans = int(input())
 
+        #On generating the figures to be played make sure it is always possible to form figures with them
         if ans == 1:
             generate_gameplay_data_main()
             #TODO: Option for the user undo the last move
