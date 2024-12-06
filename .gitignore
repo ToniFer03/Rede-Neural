@@ -1,2 +1,4 @@
 *.txt
 *.log
+.vscode/*
+!.vscode/launch.json

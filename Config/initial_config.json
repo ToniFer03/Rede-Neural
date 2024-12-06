@@ -5,5 +5,5 @@
 	"number_of_hidden_layers": 2,
 	"learning_rate": 0.01,
 	"rate_of_decrease": 0.1,
-	"number_of_epochs": 10001
+	"number_of_epochs": 201
 }

@@ -1,12 +1,14 @@
 from game_simulation import game_simulation_main
 from train_neural_network import train_neural_network_main
 from generate_gameplay_data import generate_gameplay_data_main
+from logging_setup import logging_config
 import os
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def main():
+    debug_logger, warning_logger, error_loger = logging_config("Main_Entry")
     clear_terminal()
 
     while True:
@@ -17,6 +19,7 @@ def main():
         print('[3] - Simulate the game')
         print('[0] - Exit')
         ans = int(input())
+        debug_logger.debug(f"User choose option {ans}")
 
         #On generating the figures to be played make sure it is always possible to form figures with them
         if ans == 1:

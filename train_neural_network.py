@@ -3,7 +3,7 @@ import numpy as np
 import json
 import os
 import classes
-import logging
+from logging_setup import logging_config
 
 training_inputs = []
 training_targets = []
@@ -66,47 +66,6 @@ def load_configurarions():
     number_of_epochs = configurations['number_of_epochs']
 
 
-
-def logging_config():
-    """
-        Funtion responsible for creating a folder for the logs, creating a logger for each level and file
-        handlers for each log and tests the loggers at the end
-    """
-    global debug_logger
-    global warning_logger
-    global error_logger
-
-    folder_path = create_folder_for_logs()
-
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
-    debug_logger = logging.getLogger('debug_logger')
-    warning_logger = logging.getLogger('warning_logger')
-    error_logger = logging.getLogger('error_logger')
-
-    debug_handler = logging.FileHandler(os.path.join(folder_path, 'debug.log'))
-    warning_handler = logging.FileHandler(os.path.join(folder_path, 'warning.log'))
-    error_handler = logging.FileHandler(os.path.join(folder_path, 'error.log'))
-
-    debug_handler.setLevel(logging.DEBUG)
-    warning_handler.setLevel(logging.WARNING)
-    error_handler.setLevel(logging.ERROR)
-
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-
-    debug_handler.setFormatter(formatter)
-    warning_handler.setFormatter(formatter)
-    error_handler.setFormatter(formatter)
-
-    debug_logger.addHandler(debug_handler)
-    warning_logger.addHandler(warning_handler)
-    error_logger.addHandler(error_handler)
-
-    debug_logger.debug('Debug logger set up')
-    warning_logger.warning('Warning logger set up')
-    error_logger.error('Error logger set up')
-
-
 def ask_user_weights():
     """
         Funtion responsible for asking the user how he wants to initialize the weights
@@ -147,7 +106,7 @@ def initialize_weights(weight_option):
 
     if weight_option == 1:
         string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
-        current_directory = os.getcwd() + "\Weights"
+        current_directory = os.path.join(os.getcwd(), "Weights")
         folder_path = os.path.join(current_directory, string)
 
         if not os.path.exists(folder_path):
@@ -157,15 +116,17 @@ def initialize_weights(weight_option):
         else:
             try:
                 most_recent_folder = get_most_recent_folder(folder_path)
-                folder_path = os.path.join(folder_path, most_recent_folder)
+                folder_path = folder_path + "\\" + most_recent_folder
 
                 for layer_number in range(number_of_hidden_layers + 1):
                     fileNameWeights = 'hidden_layer' + str(layer_number+1) + '_weights.txt'
                     fileNameBiases = 'hidden_layer' + str(layer_number+1) + '_biases.txt'
                     weights_array.append([])
                     biasies_array.append([])
-                    weights_array[layer_number] = np.loadtxt(os.path.join(folder_path, fileNameWeights))
-                    biasies_array[layer_number] = np.loadtxt(os.path.join(folder_path, fileNameBiases))
+                    weightsPath = os.path.join(folder_path, fileNameWeights)
+                    biasesPath = os.path.join(folder_path, fileNameBiases)
+                    weights_array[layer_number] = np.loadtxt(weightsPath)
+                    biasies_array[layer_number] = np.loadtxt(biasesPath)
 
                     if layer_number == number_of_hidden_layers:
                         biasies_array[layer_number] = biasies_array[layer_number].reshape(1, 25)
@@ -276,7 +237,7 @@ def train_data():
         loss = loss_activation.forward(hidden_layer3.output, training_targets)
         """
 
-        if epoch % 10000 == 0:
+        if epoch % 1 == 0:
             print(f'loss: {loss}')
             print(f'learning_rate: {optimizer.learning_rate}')
             print(f'epoch: {epoch}')
@@ -380,24 +341,6 @@ def create_folder_for_weights():
     return folder_path
 
 
-def create_folder_for_logs():
-    """
-        Funtion responsible for creating a folder to save the logs
-    """
-    current_directory = os.getcwd()
-    string = "Train_Neural_Network_"
-    string2 = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    folder_name = string + string2
-    string = "Logs"
-    logs_directory = os.path.join(current_directory, string)
-    if not os.path.exists(os.path.join(current_directory, string)):
-        os.makedirs(os.path.join(current_directory, string))
-    folder_path = os.path.join(logs_directory, folder_name)
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
-    return folder_path
-
-
 def get_most_recent_folder(folder_path):
     """
         Function responsible for getting the most recent folder
@@ -413,7 +356,9 @@ def get_most_recent_folder(folder_path):
 
 
 def train_neural_network_main():
-    logging_config()
+    global debug_logger, warning_logger, error_logger
+    
+    debug_logger, warning_logger, error_logger = logging_config("train_neural_network_")
     load_configurarions()
     weight_option = ask_user_weights()
     initialize_weights(weight_option)
