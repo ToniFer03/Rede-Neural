@@ -115,6 +115,7 @@ def logging_config():
     error_logger.error('Error logger set up')
 
 
+
 def ask_user_weights():
     """
         Funtion responsible for asking the user how he wants to initialize the weights
@@ -130,6 +131,7 @@ def ask_user_weights():
     debug_logger.debug(f'User chose option {option}')
 
     return option
+
 
 
 def initialize_weights(weight_option):
@@ -202,6 +204,7 @@ def initialize_weights(weight_option):
         exit()
 
 
+
 def load_training_data():
     """
         Funtion responsible for loading the training data from teh database, with which the neural network
@@ -229,6 +232,7 @@ def load_training_data():
     training_targets = np.array(training_targets)
 
 
+
 def initialize_objects():
     """
         Funtion responsible for initializing the objects from the neural network
@@ -247,6 +251,7 @@ def initialize_objects():
     activation1 = classes.Activation_ReLU()
     loss_activation = classes.Activation_Softmax_Loss_CategoricalCrossentropy()
     optimizer = classes.Optimizer_SGD(learning_rate)
+
 
 
 def train_data():
@@ -327,20 +332,9 @@ def train_data():
 
     
     debug_logger.debug(f'Maximum number of epochs reached. Epoch: {epoch}')
-            
+
+
         
-
-
-# save_weights is the function responsible for saving the weights and biases to a file
-#
-#   How it works:
-#   - Function saves the weights and biases to a file
-#
-#   Parameters:
-#   - folder_path: path to the folder where the weights will be saved
-#
-#   Returns:
-#   - Doesnt return anything
 def save_weights(folder_path):
     """
         Funtion responsible for saving the new improved weights and biases
@@ -362,6 +356,7 @@ def save_weights(folder_path):
         np.savetxt(os.path.join(folder_path, 'loss.txt'), np.array([loss]))
     except Exception as e:
         error_logger.error(f'An unexpected error occurred: {e}')
+
 
 
 def create_folder_for_weights():
@@ -400,6 +395,7 @@ def create_folder_for_weights():
     return folder_path
 
 
+
 def create_folder_for_logs():
     """
         Funtion responsible for creating a folder to save the logs
@@ -423,6 +419,7 @@ def create_folder_for_logs():
     return folder_path
 
 
+
 def get_most_recent_folder(folder_path):
     """
         Function responsible for getting the most recent folder
@@ -442,7 +439,7 @@ def get_most_recent_folder(folder_path):
 
 
 
-def main():
+def train_neural_network():
     logging_config()
     load_configurarions()
     weight_option = ask_user_weights()
@@ -452,6 +449,3 @@ def main():
     train_data()
     folder_path = create_folder_for_weights()
     save_weights(folder_path)
-
-
-main()

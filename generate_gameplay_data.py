@@ -13,8 +13,11 @@ data = []
 existing_data = []
 database_dir = "Database/"
 
+
+
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
+
 
 
 def generate_figures_queue():
@@ -27,6 +30,7 @@ def generate_figures_queue():
     num_iterations = random.randrange(10, 40)
     for i in range(num_iterations):
         figures_list.append(available_figures[random.randint(0, 3)])
+
 
 
 def count_figures(figures_list_copy, figure):
@@ -52,6 +56,7 @@ def count_figures(figures_list_copy, figure):
         if i == figure:
             count += 1
     return count
+
 
 
 def update_input_data():
@@ -95,6 +100,7 @@ def update_input_data():
     return input_data
 
 
+
 def index_to_2d(index, num_columns):
     """
         Function responsible for turning and index into a coordinate in the board
@@ -102,6 +108,7 @@ def index_to_2d(index, num_columns):
     row = index // num_columns
     col = index % num_columns
     return row, col
+
 
 
 def simulate_game():
@@ -181,6 +188,7 @@ def simulate_game():
     return (score - 2**cont)
 
 
+
 def show_board():
     """
         Prints the board on the console line
@@ -205,6 +213,7 @@ def show_board():
         
         print(row_text)
         print("-" * 24)
+
 
 
 def select_existing_database():
@@ -252,6 +261,7 @@ def select_existing_database():
                 exit()
 
 
+
 def create_new_database():
     """
         Function responsible for asking the user the name of the database file that he 
@@ -284,6 +294,7 @@ def create_new_database():
             clear_terminal()
             print("A file with that name already exists! \n")
         
+
 
 def display_database_options():
     """
@@ -319,7 +330,8 @@ def display_database_options():
             print('Not a valid answer!')
 
 
-def main():
+
+def generate_gameplay_data():
     global board
     global figures_list
     global existing_data
@@ -336,8 +348,3 @@ def main():
     existing_data.extend(pairs_list)
     with open(database_file_path, 'w') as file:
         json.dump(existing_data, file, indent=4)
-
-    return 0
-
-
-main()

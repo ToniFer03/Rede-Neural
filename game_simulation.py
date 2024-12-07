@@ -48,6 +48,7 @@ def generate_figures_queue():
         figures_list.append(available_figures[random.randint(0, 3)])
 
 
+
 def count_simbolos(figures_list_copy, figure):
     """
         Funtion responsible for many figures of a certain type are still left
@@ -70,6 +71,7 @@ def count_simbolos(figures_list_copy, figure):
         if i == figure:
             count += 1
     return count
+
 
 
 def update_input_data():
@@ -104,6 +106,7 @@ def update_input_data():
     return input_data
 
 
+
 def index_to_2d(index, num_columns):
     """
         Function responsible for turning and index into a coordinate in the board
@@ -111,6 +114,7 @@ def index_to_2d(index, num_columns):
     row = index // num_columns
     col = index % num_columns
     return row, col
+
 
 
 def simulate_game():
@@ -179,6 +183,7 @@ def simulate_game():
     return (score - 2**cont)
 
 
+
 def initialize_objects():
     """
         Funtion responsible for initializing the objects from the neural network
@@ -195,6 +200,7 @@ def initialize_objects():
 
     linear_activation = classes.Activation_ReLU()   
     softmax_activation = classes.Activation_Softmax()
+
 
 
 def show_board():
@@ -296,7 +302,7 @@ def ask_for_config():
 #TODO: At the end ask if the user wants to play again
 #TODO: Ask the user if he wants a random generated queue or a specific one to be created by him
 
-def main():
+def game_simulation():
     global board
     global figures_list
     global store_inputs
@@ -311,5 +317,3 @@ def main():
     score = simulate_game()
 
     print("Score: ", score)
-
-    return 0
