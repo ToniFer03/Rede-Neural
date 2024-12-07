@@ -18,18 +18,7 @@ number_of_epochs = None
 loss = None
 rate_of_decrease = None
 
-# Weights and biases variables
-weights_layer1 = None
-biases_layer1 = None
-weights_layer2 = None
-biases_layer2 = None
-weights_layer3 = None
-biases_layer3 = None
-
 # Objects
-hidden_layer1 = None
-hidden_layer2 = None
-hidden_layer3 = None
 activation1 = None
 loss_activation = None
 optimizer = None
@@ -39,7 +28,7 @@ debug_logger = None
 warning_logger = None
 error_logger = None
 
-#TEMP
+# Layers and values
 weights_array = []
 biases_array = []
 layers_array = []
@@ -161,7 +150,7 @@ def initialize_weights(weight_option):
     global error_logger
 
     if weight_option == 1:
-        string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
+        string = "Layers_Information\\Layers_Size_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
         folder_path = os.path.join(os.getcwd(), string)
 
         if not os.path.exists(folder_path):
@@ -330,9 +319,10 @@ def create_folder_for_weights():
         time when the saving is happening
     """
     current_directory = os.getcwd()
+    current_directory = current_directory + "\\Layers_Information"
     folder_name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
+    string = "Layers_Size_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
 
     weights_directory = os.path.join(current_directory, string)
     if not os.path.exists(os.path.join(current_directory, string)):
@@ -369,10 +359,9 @@ def create_folder_for_logs():
     string = "Train_Neural_Network_"
     string2 = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     folder_name = string + string2
-
     string = "Logs"
-
     logs_directory = os.path.join(current_directory, string)
+
     if not os.path.exists(os.path.join(current_directory, string)):
         os.makedirs(os.path.join(current_directory, string))
 
@@ -380,7 +369,7 @@ def create_folder_for_logs():
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
-    
+
     return folder_path
 
 
@@ -395,9 +384,7 @@ def get_most_recent_folder(folder_path):
         return None
 
     folders_dates = [datetime.datetime.strptime(f, "%Y-%m-%d_%H-%M-%S") for f in folders]
-
     most_recent_folder = max(folders_dates)
-
     most_recent_folder_name = most_recent_folder.strftime("%Y-%m-%d_%H-%M-%S")
 
     return most_recent_folder_name
