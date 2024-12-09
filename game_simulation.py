@@ -3,11 +3,18 @@ import numpy as np
 import classes
 import os
 import datetime
+import json
 from game_rules import verify_big_forms, verify_small_forms
 
-# Game variables
-number_of_hidden_layers = 0
-size_hidden_layers = 0
+
+#Config Variables
+number_of_inputs = None
+number_of_outputs = None
+size_hidden_layers = None
+number_of_hidden_layers = None
+learning_rate = None
+number_of_epochs = None
+rate_of_decrease = None
 
 # Game Simulation Results
 store_inputs = []
@@ -25,6 +32,34 @@ biases_array = []
 layers_array = []
 linear_activation = None
 softmax_activation = None
+
+
+def load_configurarions():
+    """
+        Funtion responsible for loading the configurations to be used on this program from a specific file
+    """
+    global number_of_inputs
+    global number_of_outputs
+    global number_of_hidden_layers
+    global size_hidden_layers
+    global learning_rate
+    global number_of_epochs
+    global rate_of_decrease
+
+    try:
+        with open('Config\\initial_config.json', 'r') as file:
+            configurations = json.load(file)
+    except Exception as e:
+        exit()
+
+    
+    number_of_inputs = configurations['number_of_inputs']
+    number_of_outputs = configurations['number_of_outputs']
+    size_hidden_layers = configurations['size_hidden_layers']
+    number_of_hidden_layers = configurations['number_of_hidden_layers']
+    learning_rate = configurations['learning_rate']
+    rate_of_decrease = configurations['rate_of_decrease']
+    number_of_epochs = configurations['number_of_epochs']
 
 
 
@@ -230,6 +265,7 @@ def load_weights():
     """
     global weights_array
     global biases_array
+    global number_of_outputs
 
     string = "Layers_Information\\Layers_Size_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
     folder_path = os.path.join(os.getcwd(), string)
@@ -250,7 +286,7 @@ def load_weights():
             if i < number_of_hidden_layers:
                 tempBiases = tempBiases.reshape(1, size_hidden_layers)
             else:
-                tempBiases = tempBiases.reshape(1, 25)
+                tempBiases = tempBiases.reshape(1, number_of_outputs)
             biases_array.append(tempBiases)
 
 
@@ -271,18 +307,6 @@ def get_most_recent_folder(folder_path):
     return most_recent_folder_name
 
 
-
-def ask_for_config():
-    """
-        Function responsible for asking the users for the neural network configuration
-    """
-    global number_of_hidden_layers
-    global size_hidden_layers
-
-    number_of_hidden_layers = int(input('Number of hidden layers: ')).__int__()
-    size_hidden_layers = int(input('Size of hidden layers: ')).__int__()
-
-
 #TODO: Dont load by most recent folder ask the user what folder he wants to use, leave the most recent function it can be usefull
 #TODO: Dont ask the user for a configuration, obtain it by loading the config file
 #TODO: Dont have the layers, weights and biasies be written into the code create them following the folder names
@@ -295,8 +319,7 @@ def game_simulation():
     global store_inputs
     global store_best_move
 
-
-    ask_for_config()
+    load_configurarions()
     load_weights()
     board = [[" " for _ in range(5)] for _ in range(5)]
     initialize_objects()
