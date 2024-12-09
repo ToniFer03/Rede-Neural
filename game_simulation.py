@@ -5,25 +5,11 @@ import os
 import datetime
 from game_rules import verify_big_forms, verify_small_forms
 
-
-# Neural network classes
-hidden_layer1 = None
-hidden_layer2 = None
-hidden_layer3 = None
-linear_activation = None
-softmax_activation = None
-
-weights_layer1 = []
-biases_layer1 = []
-weights_layer2 = []
-biases_layer2 = []
-weights_layer3 = []
-biases_layer3 = []
-
 # Game variables
 number_of_hidden_layers = 0
 size_hidden_layers = 0
 
+# Game Simulation Results
 store_inputs = []
 store_best_move = []
 
@@ -33,10 +19,12 @@ available_figures = ['X', 'O', '+', '-']
 figures_translation_value = {'X': 1, 'O': 2, '+': 3, '-': 4}
 board = []
 
-#TEMP
+# Neural Network variables
 weights_array = []
 biases_array = []
 layers_array = []
+linear_activation = None
+softmax_activation = None
 
 
 
@@ -145,6 +133,7 @@ def simulate_game():
     input_data = [0]
     while len(figures_list) > 0:
         input_data[0] = update_input_data()
+        
         layers_array[0].forward(input_data)
         linear_activation.forward(layers_array[0].output)
         for i in range(1, number_of_hidden_layers):
@@ -192,6 +181,9 @@ def initialize_objects():
     """
         Funtion responsible for initializing the objects from the neural network
     """
+    global weights_array
+    global biases_array
+    global layers_array
     global linear_activation
     global softmax_activation
 
@@ -236,9 +228,11 @@ def load_weights():
         Funtion responsible for loading the weights and biasies to be used while 
         simulating the game
     """
+    global weights_array
+    global biases_array
+
     string = "Layers_Information\\Layers_Size_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
     folder_path = os.path.join(os.getcwd(), string)
-
 
     if not os.path.exists(folder_path):
         print('No weights found for this configurarion!')
@@ -271,9 +265,7 @@ def get_most_recent_folder(folder_path):
         return None
 
     folders_dates = [datetime.datetime.strptime(f, "%Y-%m-%d_%H-%M-%S") for f in folders]
-
     most_recent_folder = max(folders_dates)
-
     most_recent_folder_name = most_recent_folder.strftime("%Y-%m-%d_%H-%M-%S")
 
     return most_recent_folder_name
@@ -292,7 +284,7 @@ def ask_for_config():
 
 
 #TODO: Dont load by most recent folder ask the user what folder he wants to use, leave the most recent function it can be usefull
-#TODO: Dont ask the user for a configuration, obtain it by the folder name
+#TODO: Dont ask the user for a configuration, obtain it by loading the config file
 #TODO: Dont have the layers, weights and biasies be written into the code create them following the folder names
 #TODO: At the end ask if the user wants to play again
 #TODO: Ask the user if he wants a random generated queue or a specific one to be created by him

@@ -144,6 +144,8 @@ def initialize_weights(weight_option):
             Number of occurances of that figure on the list
 
     """
+    global weights_array
+    global biases_array
     global learning_rate
     global debug_logger
     global warning_logger
@@ -226,6 +228,9 @@ def initialize_objects():
     """
         Funtion responsible for initializing the objects from the neural network
     """
+    global weights_array
+    global biases_array
+    global layers_array
     global activation1
     global loss_activation
     global optimizer
@@ -251,6 +256,7 @@ def train_data():
     """
     global training_inputs
     global training_targets
+    global layers_array
     global activation1
     global loss_activation
     global optimizer
@@ -300,6 +306,8 @@ def save_weights(folder_path):
             Path where the data will be saved
 
     """
+    global layers_array
+    
     try:
         for i in range(number_of_hidden_layers+1):
             weightFile = 'hidden_layer' + str(i+1) + '_weights.txt'
