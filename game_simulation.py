@@ -33,6 +33,11 @@ available_figures = ['X', 'O', '+', '-']
 figures_translation_value = {'X': 1, 'O': 2, '+': 3, '-': 4}
 board = []
 
+#TEMP
+weights_array = []
+biases_array = []
+layers_array = []
+
 
 
 def generate_figures_queue():
@@ -130,9 +135,7 @@ def simulate_game():
     """
     global board
     global figures_list
-    global hidden_layer1
-    global hidden_layer2
-    global hidden_layer3
+    global layers_array
     global linear_activation
     global softmax_activation
     global store_inputs
@@ -142,12 +145,13 @@ def simulate_game():
     input_data = [0]
     while len(figures_list) > 0:
         input_data[0] = update_input_data()
-        hidden_layer1.forward(input_data)
-        linear_activation.forward(hidden_layer1.output)
-        hidden_layer2.forward(linear_activation.output)
-        linear_activation.forward(hidden_layer2.output)
-        hidden_layer3.forward(linear_activation.output)
-        softmax_activation.forward(hidden_layer3.output)
+        layers_array[0].forward(input_data)
+        linear_activation.forward(layers_array[0].output)
+        for i in range(1, number_of_hidden_layers):
+            layers_array[i].forward(linear_activation.output)
+            linear_activation.forward(layers_array[i].output)
+        layers_array[number_of_hidden_layers].forward(linear_activation.output)
+        softmax_activation.forward(layers_array[number_of_hidden_layers].output)
 
         flattened_output = softmax_activation.output.flatten()
         sorted_actions = sorted(range(len(flattened_output)), key=lambda k: flattened_output[k], reverse=True)
@@ -188,15 +192,12 @@ def initialize_objects():
     """
         Funtion responsible for initializing the objects from the neural network
     """
-    global hidden_layer1
-    global hidden_layer2
-    global hidden_layer3
     global linear_activation
     global softmax_activation
 
-    hidden_layer1 = classes.Layer_Dense(None, None, weights_layer1, biases_layer1) 
-    hidden_layer2 = classes.Layer_Dense(None, None, weights_layer2, biases_layer2) 
-    hidden_layer3 = classes.Layer_Dense(None, None, weights_layer3, biases_layer3)
+    for i in range(0, number_of_hidden_layers+1):
+        tempLayer = classes.Layer_Dense(None, None, weights_array[i], biases_array[i])
+        layers_array.append(tempLayer)
 
     linear_activation = classes.Activation_ReLU()   
     softmax_activation = classes.Activation_Softmax()
@@ -235,15 +236,9 @@ def load_weights():
         Funtion responsible for loading the weights and biasies to be used while 
         simulating the game
     """
-    global weights_layer1
-    global biases_layer1
-    global weights_layer2
-    global biases_layer2
-    global weights_layer3
-    global biases_layer3
-
-    string = "Weights_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
+    string = "Layers_Information\\Layers_Size_" + str(number_of_hidden_layers) + "_" + str(size_hidden_layers)
     folder_path = os.path.join(os.getcwd(), string)
+
 
     if not os.path.exists(folder_path):
         print('No weights found for this configurarion!')
@@ -252,17 +247,17 @@ def load_weights():
         most_recent_folder = get_most_recent_folder(folder_path)
         folder_path = os.path.join(folder_path, most_recent_folder)
 
-        weights_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_weights.txt'))
-        biases_layer1 = np.loadtxt(os.path.join(folder_path, 'hidden_layer1_biases.txt'))
-        biases_layer1 = biases_layer1.reshape(1, size_hidden_layers)
-
-        weights_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_weights.txt'))
-        biases_layer2 = np.loadtxt(os.path.join(folder_path, 'hidden_layer2_biases.txt'))
-        biases_layer2 = biases_layer2.reshape(1, size_hidden_layers)
-
-        weights_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_weights.txt'))
-        biases_layer3 = np.loadtxt(os.path.join(folder_path, 'hidden_layer3_biases.txt'))
-        biases_layer3 = biases_layer3.reshape(1, 25)
+        for i in range(number_of_hidden_layers+1):
+            weightFile = 'hidden_layer' + str(i+1) + '_weights.txt'
+            tempWeight = np.loadtxt(os.path.join(folder_path, weightFile))
+            weights_array.append(tempWeight)
+            biasesFile = 'hidden_layer' + str(i+1) + '_biases.txt'
+            tempBiases = np.loadtxt(os.path.join(folder_path, biasesFile))
+            if i < number_of_hidden_layers:
+                tempBiases = tempBiases.reshape(1, size_hidden_layers)
+            else:
+                tempBiases = tempBiases.reshape(1, 25)
+            biases_array.append(tempBiases)
 
 
 
