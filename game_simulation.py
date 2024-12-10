@@ -33,6 +33,18 @@ layers_array = []
 linear_activation = None
 softmax_activation = None
 
+# Colours
+BLACK = '\033[30m'
+RED = '\033[31m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+BLUE = '\033[34m'
+MAGENTA = '\033[35m'
+CYAN = '\033[36m'
+WHITE = '\033[37m'
+UNDERLINE = '\033[4m'
+RESET = '\033[0m'
+
 
 def load_configurarions():
     """
@@ -239,6 +251,7 @@ def show_board():
 
     print("-" * 24)
     count = 1
+    colour = None
     for row in board:
         row_text = ""
         for cedule in row:
@@ -250,7 +263,16 @@ def show_board():
                 else:
                     row_text = row_text + str(count) + " "
             else:
-                row_text = row_text + cedule + "  "
+                if cedule == available_figures[0]:
+                    colour = RED
+                elif cedule == available_figures[1]:
+                    colour = GREEN 
+                elif cedule == available_figures[2]:
+                    colour = BLUE   
+                else:
+                    colour = YELLOW
+                    
+                row_text = row_text + colour + cedule + WHITE + "  "
             count += 1
         
         print(row_text)
@@ -308,10 +330,8 @@ def get_most_recent_folder(folder_path):
 
 
 #TODO: Dont load by most recent folder ask the user what folder he wants to use, leave the most recent function it can be usefull
-#TODO: Dont ask the user for a configuration, obtain it by loading the config file
-#TODO: Dont have the layers, weights and biasies be written into the code create them following the folder names
-#TODO: At the end ask if the user wants to play again
 #TODO: Ask the user if he wants a random generated queue or a specific one to be created by him
+#TODO: Change the colour of the figures in relation to the board to make them more visible
 
 def game_simulation():
     global board

@@ -13,6 +13,18 @@ data = []
 existing_data = []
 database_dir = "Database/"
 
+# Colours
+BLACK = '\033[30m'
+RED = '\033[31m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+BLUE = '\033[34m'
+MAGENTA = '\033[35m'
+CYAN = '\033[36m'
+WHITE = '\033[37m'
+UNDERLINE = '\033[4m'
+RESET = '\033[0m'
+
 
 
 def clear_terminal():
@@ -197,6 +209,7 @@ def show_board():
 
     print("-" * 24)
     count = 1
+    colour = None
     for row in board:
         row_text = ""
         for cedule in row:
@@ -208,7 +221,16 @@ def show_board():
                 else:
                     row_text = row_text + str(count) + " "
             else:
-                row_text = row_text + cedule + "  "
+                if cedule == available_figures[0]:
+                    colour = RED
+                elif cedule == available_figures[1]:
+                    colour = GREEN 
+                elif cedule == available_figures[2]:
+                    colour = BLUE   
+                else:
+                    colour = YELLOW
+                    
+                row_text = row_text + colour + cedule + WHITE + "  "
             count += 1
         
         print(row_text)
@@ -331,6 +353,7 @@ def display_database_options():
 
 
 
+#TODO: Be able to revert a move
 def generate_gameplay_data():
     global board
     global figures_list
