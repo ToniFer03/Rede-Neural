@@ -46,6 +46,7 @@ UNDERLINE = '\033[4m'
 RESET = '\033[0m'
 
 
+
 def load_configurarions():
     """
         Funtion responsible for loading the configurations to be used on this program from a specific file
@@ -76,6 +77,29 @@ def load_configurarions():
 
 
 def generate_figures_queue():
+    while True:
+        print('Do you want a random figures queue or a custom one')
+        print('----------------------------------------')
+        print('[1] - Random')
+        print('[2] - Custom')
+        print('[0] - Exit the program')
+        ans = str(input()).strip()
+
+        if ans == '1':
+            create_custom_figure_queue()
+            return
+        elif ans == '2':
+            create_custom_figure_queue()
+            return
+        elif ans == '0':
+            exit()
+        else:
+            clear_terminal()
+            print('Invalid option! Please choose one of the options available to you')
+
+
+
+def create_random_figures_queue():
     """
         Funtion responsible for generating a queue of random figures to be played
 
@@ -86,6 +110,55 @@ def generate_figures_queue():
     num_iterations = random.randrange(10, 40)
     for i in range(num_iterations):
         figures_list.append(available_figures[random.randint(0, 3)])
+
+
+
+def create_custom_figure_queue():
+    global figures_list
+    global available_figures
+
+    clear_terminal()
+    while True:
+        figures_string = 'Queue: '
+        for i in figures_list:
+            if i == available_figures[0]:
+                    colour = RED
+            elif i == available_figures[1]:
+                colour = GREEN 
+            elif i == available_figures[2]:
+                colour = BLUE   
+            else:
+                colour = YELLOW
+            figures_string = figures_string + colour + i + WHITE + " "
+        
+        print(figures_string)
+        print('----------------------------------------')
+        print('Select the figures you want for the queue [1-4]')
+        print('----------------------------------------')
+        print('[1] - X')
+        print('[2] - Cross')
+        print('[3] - Circle')
+        print('[4] - Dash')
+        print('[0] - Exit Figure Selection')
+        ans = str(input()).strip()
+
+        if ans == '0':
+            return
+        elif ans == '1':
+            figures_list.append(available_figures[0])
+            clear_terminal()
+        elif ans == '2':
+            figures_list.append(available_figures[1])
+            clear_terminal()
+        elif ans == '3':
+            figures_list.append(available_figures[2])
+            clear_terminal()
+        elif ans == '4':
+            figures_list.append(available_figures[3])
+            clear_terminal()
+        else:
+            clear_terminal()
+            print('Invalid option! Please choose one of the options available to you')
 
 
 
@@ -313,6 +386,11 @@ def load_weights():
 
 
 
+def clear_terminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+
 def get_most_recent_folder(folder_path):
     """
         Function responsible for getting the most recent folder
@@ -329,9 +407,6 @@ def get_most_recent_folder(folder_path):
     return most_recent_folder_name
 
 
-#TODO: Dont load by most recent folder ask the user what folder he wants to use, leave the most recent function it can be usefull
-#TODO: Ask the user if he wants a random generated queue or a specific one to be created by him
-#TODO: Change the colour of the figures in relation to the board to make them more visible
 
 def game_simulation():
     global board
