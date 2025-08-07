@@ -33,6 +33,10 @@ layers_array = []
 linear_activation = None
 softmax_activation = None
 
+#Rules for making random figure queues
+FigureXandCrossNumbers = [0, 5, 9, 10, 14, 15, 18, 19, 20, 23, 24, 25, 27, 28, 29, 30,
+32, 33, 34, 35, 36, 37, 38, 39, 40]
+
 # Colours
 BLACK = '\033[30m'
 RED = '\033[31m'
@@ -107,9 +111,42 @@ def create_random_figures_queue():
     global figures_list
     global available_figures
 
-    num_iterations = random.randrange(10, 40)
-    for i in range(num_iterations):
-        figures_list.append(available_figures[random.randint(0, 3)])
+    while True:
+        num_iterations = random.randrange(20, 40)
+        xCount = 0
+        crossCount = 0
+        circleCount = 0
+
+        for i in range(num_iterations):
+            next_figure = available_figures[random.randint(0, 3)]
+
+            if next_figure == available_figures[0]:
+                xCount += 1
+
+            if next_figure == available_figures[1]:
+                circleCount += 1
+            
+            if next_figure == available_figures[2]:
+                crossCount += 1
+            
+            figures_list.append(next_figure)
+        
+        gamerulesCount = 0
+        if xCount in FigureXandCrossNumbers:
+            gamerulesCount += 1
+
+        if crossCount in FigureXandCrossNumbers:
+            gamerulesCount += 1
+
+        if circleCount % 4 == 0:
+            gamerulesCount += 1
+        
+        if gamerulesCount == 3:
+            break
+        else:
+            figures_list = []
+
+
 
 
 
