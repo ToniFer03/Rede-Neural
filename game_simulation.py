@@ -1,6 +1,6 @@
 import random
 import numpy as np
-import classes
+from Classes import NeuralNetworkStructure
 import os
 import datetime
 import json
@@ -86,7 +86,7 @@ def generate_figures_queue():
         ans = str(input()).strip()
 
         if ans == '1':
-            create_custom_figure_queue()
+            create_random_figures_queue()
             return
         elif ans == '2':
             create_custom_figure_queue()
@@ -308,11 +308,11 @@ def initialize_objects():
     global softmax_activation
 
     for i in range(0, number_of_hidden_layers+1):
-        tempLayer = classes.Layer_Dense(None, None, weights_array[i], biases_array[i])
+        tempLayer = NeuralNetworkStructure.Layer_Dense(None, None, weights_array[i], biases_array[i])
         layers_array.append(tempLayer)
 
-    linear_activation = classes.Activation_ReLU()   
-    softmax_activation = classes.Activation_Softmax()
+    linear_activation = NeuralNetworkStructure.Activation_ReLU()   
+    softmax_activation = NeuralNetworkStructure.Activation_Softmax()
 
 
 

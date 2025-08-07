@@ -2,7 +2,7 @@ import datetime
 import numpy as np
 import json
 import os
-import classes
+from Classes import NeuralNetworkStructure
 import logging
 
 training_inputs = []
@@ -235,17 +235,17 @@ def initialize_objects():
     global loss_activation
     global optimizer
 
-    tempLayer = classes.Layer_Dense(number_of_inputs, size_hidden_layers, weights_array[0], biases_array[0])
+    tempLayer = NeuralNetworkStructure.Layer_Dense(number_of_inputs, size_hidden_layers, weights_array[0], biases_array[0])
     layers_array.append(tempLayer)
     for i in range(1, number_of_hidden_layers):
-        tempLayer = classes.Layer_Dense(size_hidden_layers, size_hidden_layers, weights_array[i], biases_array[i])
+        tempLayer = NeuralNetworkStructure.Layer_Dense(size_hidden_layers, size_hidden_layers, weights_array[i], biases_array[i])
         layers_array.append(tempLayer)
-    tempLayer = classes.Layer_Dense(size_hidden_layers, number_of_outputs, weights_array[number_of_hidden_layers], biases_array[number_of_hidden_layers])
+    tempLayer = NeuralNetworkStructure.Layer_Dense(size_hidden_layers, number_of_outputs, weights_array[number_of_hidden_layers], biases_array[number_of_hidden_layers])
     layers_array.append(tempLayer)
 
-    activation1 = classes.Activation_ReLU()
-    loss_activation = classes.Activation_Softmax_Loss_CategoricalCrossentropy()
-    optimizer = classes.Optimizer_SGD(learning_rate)
+    activation1 = NeuralNetworkStructure.Activation_ReLU()
+    loss_activation = NeuralNetworkStructure.Activation_Softmax_Loss_CategoricalCrossentropy()
+    optimizer = NeuralNetworkStructure.Optimizer_SGD(learning_rate)
 
 
 
@@ -289,7 +289,7 @@ def train_data():
             optimizer.update_params(layers_array[i])
 
 
-        if epoch % 1 == 0:
+        if epoch % 1000 == 0:
             debug_logger.debug(f'Epoch: {epoch} - Loss: {loss} - Learning rate: {optimizer.learning_rate}')
     
     debug_logger.debug(f'Maximum number of epochs reached. Epoch: {epoch}')

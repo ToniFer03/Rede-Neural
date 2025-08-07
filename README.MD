@@ -1,11 +1,21 @@
-﻿# Figuma Neural Network
+﻿# Neural network written in python to solve a Figuma game
 
-## Table of Contents
-
+## Table of contents
+- [Function of the code](#a-function-code-that-immitates-a-ticket-machine-in-a-metro-system-done-in-the-context-of-a-university-project)
 - [Commit Rules](#rules-to-follow-before-a-commit)
 - [Branches](#rules-for-branches)
-- [User Manual](#user-manual)
-- [Game Rules](#game-rules)
+- [Requirements](#requirements)
+- [Setup](#how-to-setup-the-tools)
+- [User Manual](#how-to-use-the-code)
+- [Video Demo](#video-demonstration-of-the-repository)
+- [Resume of the code](#Resume-of-the-code)
+
+
+## Neural network project made to solve a Figuma game  
+To understand the Game please check out the Gamerules PDF on the Help folder in this repository. This project allows you to tweek the parameters
+of the neural network, create and select what database you want to use to train the neural network, play to expand the database and test the effectiveness
+of the Neural network in game.
+It is made primarly to showcase how an implementation of this type could work to solve a complex game with a lot of variables.  
 
 ## Rules to follow before a commit
 
@@ -19,7 +29,7 @@ The commits must be atomic, only one objective
 
 The available types with their respective emojis:  
 🏗️build - Changes to the project build  
-🔄️ci - Changes to the continuos integration cycle  
+🔄️ci - Changes to the continuous integration cycle  
 📄docs - Changes to project documentation  
 🎨style - Changes related to the styling of the code  
 ✨feat - Changes that add new features  
@@ -38,7 +48,8 @@ Compiler, readme, forms
 ### Description:
 
 Brief description of the changes made, must be in english, present verb form of the imperative and without a full stop, example:
-feat(validations): implement server-side validations
+feat(validations): implement messageServer-side validations
+
 
 ## Rules for Branches
 
@@ -57,6 +68,28 @@ There can also exist temporary branches like:
 
 The branch names must be short and explain its purpose, can't contain special characters of white spaces;
 
-## User Manual
 
-## Game Rules
+## Requirements
+
+Python 3.12 or superior
+
+
+##  How to use the code
+
+1. Open the Config file and choose what configuration you want your neural network to have
+2. Run the main.py file 
+3. Choose one of the options
+
+1. Selecting option one you need to select a database file to store the new game data
+
+1. Selecting option 2 you can select either:
+2. Load the most recent weights of the configuration you have choosen and improve it
+3. Create new weights with that same configuration
+
+1. Selecting option 3:
+2. Select a random queue of figures for the Neural network to solve
+3. Select a custom queue of figures for the Neural network to solve
+
+## Video demonstration of the repository   
+
+## Resume of the code  
