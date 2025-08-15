@@ -3,6 +3,7 @@ import json
 import os
 import game_rules
 import itertools
+from operator import itemgetter
 
 # Variables
 figures_list = []
@@ -19,6 +20,8 @@ number_circle_padrons = []
 number_cross_padrons = []
 number_dash_padrons = []
 active_figures = [] #X, Cross, Circle, Dash
+
+rank_best_figures = [] #List of lists, where the indexes on the inside list represent, score, index on the number_x_padrons list and index on the number_cross_padrons_list
 
 all_X_Permutations = []
 all_cross_permutations = []
@@ -231,6 +234,55 @@ def update_input_data(next_figure):
         return position_play
 
 
+def rank_best_figure_options():
+    #TODO: Comments
+    combinations_X = []
+    combinations_cross = []
+    best_overall_combination = []
+    count = 0
+    
+    #Check all x combinations
+    for i in number_x_padrons:
+        score = pow(2, 9) * i[0] + pow(2, 5) * i[1] #Calculate the score
+        combinations_X.append(['X', count, score, i[2]]) # Append the result of the score and the number of figures not used
+        count += 1
+
+
+    #Check all cross combinations
+    count = 0
+    for i in number_cross_padrons:
+        score = pow(2, 9) * i[0] + pow(2, 5) * i[1] #Calculate the score
+        combinations_cross.append(['+', count, score, i[2]]) # Append the result of the score and the number of figures not used
+        count += 1
+    
+
+    #Calculate the best combinations together 
+    count_i = 0
+    count_j = 0
+    for i in combinations_X:
+        for j in combinations_cross:
+            score = combinations_X[count_i][2] + combinations_cross[count_j][2] - pow(2, combinations_X[count_i][3] + combinations_cross[count_j][3])
+            best_overall_combination.append([score, count_i, count_j]) #Stores the score as well as the index of the combinations that gives those scores
+            count_j += 1
+        
+        count_j = 0
+        count_i += 1
+    
+    print(best_overall_combination)
+
+    #Rank combinations
+    rank_best_figures = sorted(best_overall_combination, key=itemgetter(0), reverse=True)
+
+    print(rank_best_figures)
+
+
+
+def generate_every_permutation():
+    #TODO: Comments
+
+    return 0
+
+
 def simulate_game():
     """
         Function responsible for simulating the game and obtaining the final score
@@ -316,6 +368,7 @@ def initialize_game():
     generate_list_number_figures()
     generate_lists_x_padrons()
     generate_lists_cross_padrons()
+    rank_best_figure_options()
     
     print(1)
     
