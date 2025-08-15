@@ -4,6 +4,7 @@ from Classes import NeuralNetworkStructure
 import os
 import datetime
 import json
+import time
 from game_rules import verify_big_forms, verify_small_forms
 
 
@@ -362,6 +363,7 @@ def show_board():
     print("-" * 24)
     count = 1
     colour = None
+    time.sleep(2)
     for row in board:
         row_text = ""
         for cedule in row:
@@ -387,6 +389,7 @@ def show_board():
         
         print(row_text)
         print("-" * 24)
+        
 
 
 
